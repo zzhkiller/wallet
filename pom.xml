@@ -34,5 +34,6 @@
   <module>wallet-api</module>
   <module>wallet-assemble</module>
   <module>wallet-common</module>
+    <module>wallet-service</module>
   </modules>
 </project>
