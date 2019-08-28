@@ -15,12 +15,12 @@ import javax.servlet.http.HttpServletRequest;
  * copyright generalray4239@gmail.com
  */
 
-@Api(value = "des API", description = "des API", protocols = "http")
+@Api(value = "rsa API", description = "rsa API", protocols = "http")
 public interface RsaApi {
 
 
-  @ApiOperation(value = "获取DES public key", notes = "获取DES public key", protocols = "https", httpMethod = "GET")
-  @RequestMapping(value = "/getPublicKey", method = RequestMethod.POST)
+  @ApiOperation(value = "获取rsa public key", notes = "获取rsa public key", protocols = "https", httpMethod = "GET")
+  @RequestMapping(value = "/getPublicKey", method = RequestMethod.GET)
   BaseResponse<String> getPublicKey(HttpServletRequest request);
 
 }

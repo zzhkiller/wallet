@@ -186,7 +186,11 @@ public class RSACoder {
 
     //私钥
     byte[] privateKey = RSACoder.getPrivateKey(keyMap);
-    System.out.println("公钥：/n" + Base64.encodeBase64String(publicKey));
+
+    String publicKeyStr = Base64.encodeBase64String(publicKey);
+    System.out.println("公钥：/n" + publicKeyStr);
+
+
     System.out.println("私钥：/n" + Base64.encodeBase64String(privateKey));
 
     System.out.println("================密钥对构造完毕,甲方将公钥公布给乙方，开始进行加密数据的传输=============");

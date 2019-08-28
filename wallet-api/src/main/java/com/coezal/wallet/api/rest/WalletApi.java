@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
  * copyright generalray4239@gmail.com
  */
 
-@Api(value = "Wallet API", description = "Wallet API", protocols = "http")
+@Api(value = "WalletBean API", description = "WalletBean API", protocols = "http")
 public interface WalletApi {
 
   @ApiOperation(value = "获取钱包地址", notes = "获取钱包地址", protocols = "https")

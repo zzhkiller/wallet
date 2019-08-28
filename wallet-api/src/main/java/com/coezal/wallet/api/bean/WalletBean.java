@@ -11,7 +11,7 @@ import java.util.List;
  * </pre>
  * copyright generalray4239@gmail.com
  */
-public class Wallet {
+public class WalletBean {
 
   private Long id;// 主键id
   private String password; //生成钱包的秘钥，手机号码或者邮箱
@@ -20,8 +20,10 @@ public class Wallet {
   private String mnemonicList;//助记词， 根据生成方式的不同，有可能没有助记词， 助记词之间用,分割
   private String keyStoreJson;//生成的keystore json文件，如果采用助记词就没有
   private String ownerInfo; // 钱包拥有者信息，电话或者邮箱的MD5
+  private String signKey; // 解密私钥
 
-  public Wallet() {
+
+  public WalletBean() {
   }
 
   public Long getId() {
@@ -78,5 +80,13 @@ public class Wallet {
 
   public void setOwnerInfo(String ownerInfo) {
     this.ownerInfo = ownerInfo;
+  }
+
+  public String getSignKey() {
+    return signKey;
+  }
+
+  public void setSignKey(String signKey) {
+    this.signKey = signKey;
   }
 }

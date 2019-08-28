@@ -1,9 +1,9 @@
 package com.coezal.wallet.biz.service;
 
-import com.coezal.wallet.api.bean.Wallet;
+import com.coezal.wallet.api.bean.WalletBean;
 import com.coezal.wallet.common.util.RSACoder;
 import com.coezal.wallet.common.util.StringFormat;
-import com.coezal.wallet.common.util.WalletUtils;
+import com.coezal.wallet.biz.wallet.network.WalletUtils;
 import com.coezal.wallet.dal.dao.WalletMapper;
 import org.springframework.stereotype.Service;
 
@@ -31,25 +31,25 @@ public class WalletServiceImpl implements WalletService {
       byte[] bytes = param.getBytes();
       String ownerInfo = new String(RSACoder.decryptByPrivateKey(param.getBytes(), bytes));
       if (!StringFormat.isMatchWalletOwnInfo(ownerInfo)) { //参数不是电话或者邮箱
-        Wallet queryWallet = new Wallet();
-        queryWallet.setOwnerInfo(param);
-        Wallet hadWallet = walletMapper.selectOne(queryWallet);
-        if (hadWallet != null) {
+        WalletBean queryWalletBean = new WalletBean();
+        queryWalletBean.setOwnerInfo(param);
+        WalletBean hadWalletBean = walletMapper.selectOne(queryWalletBean);
+        if (hadWalletBean != null) {
           //抛出异常，用户钱包已经存在了，一个用户只能有一个钱包
           return null;
         } else { //查询联系人地址为空的钱包
-          queryWallet.setOwnerInfo(null);
-          List<Wallet> walletList = walletMapper.selectAll(queryWallet);
-          if (walletList != null && walletList.size() > 0) {
-            Wallet wallet = walletList.get(0);
-            wallet.setOwnerInfo(param);
-            walletMapper.update(wallet);//更新钱包数据
-            return walletList.get(0).getAddress();
+          queryWalletBean.setOwnerInfo(null);
+          List<WalletBean> walletBeanList = walletMapper.selectAll(queryWalletBean);
+          if (walletBeanList != null && walletBeanList.size() > 0) {
+            WalletBean walletBean = walletBeanList.get(0);
+            walletBean.setOwnerInfo(param);
+            walletMapper.update(walletBean);//更新钱包数据
+            return walletBeanList.get(0).getAddress();
           } else { //钱包地址不够了，重新生成钱包
-            Wallet wallet = WalletUtils.createWallet();
-            wallet.setOwnerInfo(param);
-            walletMapper.insert(wallet);//插入钱包数据
-            return wallet.getAddress();
+            WalletBean walletBean = WalletUtils.createWallet();
+            walletBean.setOwnerInfo(param);
+            walletMapper.insert(walletBean);//插入钱包数据
+            return walletBean.getAddress();
           }
         }
       } else {

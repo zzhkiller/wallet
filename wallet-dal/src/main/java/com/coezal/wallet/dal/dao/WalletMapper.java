@@ -1,6 +1,6 @@
 package com.coezal.wallet.dal.dao;
 
-import com.coezal.wallet.api.bean.Wallet;
+import com.coezal.wallet.api.bean.WalletBean;
 
 import java.util.List;
 
@@ -14,37 +14,37 @@ public interface WalletMapper {
 
   /**
    *
-   * @param wallet
+   * @param walletBean
    * @return
    */
-  int insert(Wallet wallet);
+  int insert(WalletBean walletBean);
 
   /**
    *
-   * @param wallet
+   * @param walletBean
    * @return
    */
-  int update(Wallet wallet);
+  int update(WalletBean walletBean);
 
   /**
    * 通过主键获取id
    * @param id
    * @return
    */
-  Wallet selectById(Long id);
+  WalletBean selectById(Long id);
 
 
   /**
    * 查询满足条件的 所有wallet
-   * @param wallet
+   * @param walletBean
    * @return
    */
-  List<Wallet> selectAll(Wallet wallet);
+  List<WalletBean> selectAll(WalletBean walletBean);
 
   /**
    * 查询满足条件的唯一wallet
-   * @param wallet
+   * @param walletBean
    * @return
    */
-  Wallet selectOne(Wallet wallet);
+  WalletBean selectOne(WalletBean walletBean);
 }
