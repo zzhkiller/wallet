@@ -15,6 +15,7 @@ public class Token {
   private int tokenDecimals;
   private String tokenName;
   private String tokenSymbol;
+  private String tokenABI;
 
   public String getTokenContractAddress() {
     return tokenContractAddress;
@@ -46,5 +47,13 @@ public class Token {
 
   public void setTokenSymbol(String tokenSymbol) {
     this.tokenSymbol = tokenSymbol;
+  }
+
+  public String getTokenABI() {
+    return tokenABI;
+  }
+
+  public void setTokenABI(String tokenABI) {
+    this.tokenABI = tokenABI;
   }
 }

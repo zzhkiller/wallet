@@ -1,0 +1,32 @@
+package com.coezal.wallet;
+
+import com.coezal.wallet.api.rest.WalletApi;
+import com.coezal.wallet.api.vo.base.BaseResponse;
+import com.coezal.wallet.biz.service.WalletService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+
+/**
+ * Version 1.0
+ * Created by lll on 2019-08-27.
+ * Description
+ * copyright generalray4239@gmail.com
+ */
+
+@RestController
+public class WalletController extends AbstractController implements WalletApi {
+
+  @Resource
+  WalletService walletService;
+
+  private static final Logger logger  = LoggerFactory.getLogger("WalletController");
+
+  @Override
+  public BaseResponse<String> getWalletAddress(String str) {
+    return buildJson(walletService.getWalletAddress(str));
+  }
+
+}

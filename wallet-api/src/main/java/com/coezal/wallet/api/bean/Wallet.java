@@ -13,11 +13,24 @@ import java.util.List;
  */
 public class Wallet {
 
+  private Long id;// 主键id
   private String password; //生成钱包的秘钥，手机号码或者邮箱
   private String address; //钱包地址;
   private String privateKey;// 钱包私钥;
-  private List<String> mnemonicList;//助记词， 根据生成方式的不同，有可能没有助记词
+  private String mnemonicList;//助记词， 根据生成方式的不同，有可能没有助记词， 助记词之间用,分割
   private String keyStoreJson;//生成的keystore json文件，如果采用助记词就没有
+  private String ownerInfo; // 钱包拥有者信息，电话或者邮箱的MD5
+
+  public Wallet() {
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
 
   public String getPassword() {
     return password;
@@ -43,11 +56,11 @@ public class Wallet {
     this.privateKey = privateKey;
   }
 
-  public List<String> getMnemonicList() {
+  public String getMnemonicList() {
     return mnemonicList;
   }
 
-  public void setMnemonicList(List<String> mnemonicList) {
+  public void setMnemonicList(String mnemonicList) {
     this.mnemonicList = mnemonicList;
   }
 
@@ -57,5 +70,13 @@ public class Wallet {
 
   public void setKeyStoreJson(String keyStoreJson) {
     this.keyStoreJson = keyStoreJson;
+  }
+
+  public String getOwnerInfo() {
+    return ownerInfo;
+  }
+
+  public void setOwnerInfo(String ownerInfo) {
+    this.ownerInfo = ownerInfo;
   }
 }
