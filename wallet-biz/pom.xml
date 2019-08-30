@@ -48,5 +48,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.ethereum</groupId>
+            <artifactId>geth</artifactId>
+            <version>1.7.3</version>
+            <type>pom</type>
+        </dependency>
+
+
     </dependencies>
 </project>

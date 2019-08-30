@@ -89,4 +89,19 @@ public class WalletBean {
   public void setSignKey(String signKey) {
     this.signKey = signKey;
   }
+
+
+  @Override
+  public String toString() {
+    return "WalletBean{" +
+            "id=" + id +
+            ", password='" + password + '\'' +
+            ", address='" + address + '\'' +
+            ", privateKey='" + privateKey + '\'' +
+            ", mnemonicList='" + mnemonicList + '\'' +
+            ", keyStoreJson='" + keyStoreJson + '\'' +
+            ", ownerInfo='" + ownerInfo + '\'' +
+            ", signKey='" + signKey + '\'' +
+            '}';
+  }
 }

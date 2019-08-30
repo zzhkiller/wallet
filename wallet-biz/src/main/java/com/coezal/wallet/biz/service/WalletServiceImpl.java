@@ -1,9 +1,12 @@
 package com.coezal.wallet.biz.service;
 
+import com.coezal.wallet.api.bean.RsaKey;
 import com.coezal.wallet.api.bean.WalletBean;
+import com.coezal.wallet.biz.wallet.PasswordGenerator;
+import com.coezal.wallet.biz.wallet.WalletGenerator;
 import com.coezal.wallet.common.util.RSACoder;
 import com.coezal.wallet.common.util.StringFormat;
-import com.coezal.wallet.biz.wallet.network.WalletUtils;
+import com.coezal.wallet.dal.dao.RsaMapper;
 import com.coezal.wallet.dal.dao.WalletMapper;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,9 @@ public class WalletServiceImpl implements WalletService {
 
   @Resource
   WalletMapper walletMapper;
+
+  @Resource
+  RsaMapper rsaMapper;
 
 
   @Override
@@ -46,9 +52,9 @@ public class WalletServiceImpl implements WalletService {
             walletMapper.update(walletBean);//更新钱包数据
             return walletBeanList.get(0).getAddress();
           } else { //钱包地址不够了，重新生成钱包
-            WalletBean walletBean = WalletUtils.createWallet();
+            WalletBean walletBean = WalletGenerator.createEthWallet(PasswordGenerator.generatorPassword());
             walletBean.setOwnerInfo(param);
-            walletMapper.insert(walletBean);//插入钱包数据
+            encryptAndInsertWallet(walletBean);
             return walletBean.getAddress();
           }
         }
@@ -58,6 +64,16 @@ public class WalletServiceImpl implements WalletService {
     } catch (Exception e) {
       return null;
     }
-//    return "0x90008C50463fd01106bE72Fcff15e44e86c8088E";
+  }
+
+
+  private void encryptAndInsertWallet(WalletBean walletBean){
+    List<RsaKey> rsaKeyList = rsaMapper.select(null);
+
+    walletBean.setSignKey(rsaKeyList.get(0).getPrivateKey());
+//    RSACoder.encryptByPublicKey( ,)
+//    walletBean.setPassword();
+
+    walletMapper.insert(walletBean);//插入钱包数据
   }
 }
