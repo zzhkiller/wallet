@@ -2,6 +2,9 @@ package com.coezal.wallet.biz.service;
 
 import com.coezal.wallet.api.bean.FetchCashResponse;
 import com.coezal.wallet.api.bean.PayCheckResponse;
+import com.coezal.wallet.api.bean.WalletBean;
+
+import java.util.List;
 
 /**
  * Version 1.0
@@ -31,4 +34,10 @@ public interface WalletService {
    * @return
    */
   FetchCashResponse fetchCash(String dataStr);
+
+  /**
+   * 获取所有用户的钱包地址
+   * @return
+   */
+  List<WalletBean> getAllUserAddresses();
 }

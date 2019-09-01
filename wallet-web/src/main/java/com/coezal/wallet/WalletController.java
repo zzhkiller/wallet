@@ -2,6 +2,7 @@ package com.coezal.wallet;
 
 import com.coezal.wallet.api.bean.FetchCashResponse;
 import com.coezal.wallet.api.bean.PayCheckResponse;
+import com.coezal.wallet.api.bean.WalletBean;
 import com.coezal.wallet.api.rest.WalletApi;
 import com.coezal.wallet.api.vo.base.BaseResponse;
 import com.coezal.wallet.biz.service.WalletService;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * Version 1.0
@@ -39,6 +41,11 @@ public class WalletController extends AbstractController implements WalletApi {
   @Override
   public BaseResponse<FetchCashResponse> fetchCash(String dataStr) {
     return buildJson(walletService.fetchCash(dataStr));
+  }
+
+  @Override
+  public BaseResponse<List<WalletBean>> getAllUserAddresses() {
+    return buildJson(walletService.getAllUserAddresses());
   }
 
 }

@@ -104,6 +104,12 @@ public class WalletServiceImpl implements WalletService {
     return new FetchCashResponse();
   }
 
+  @Override
+  public List<WalletBean> getAllUserAddresses() {
+    //TODO 获取所有用户的钱包地址
+    return null;
+  }
+
   private void checkWalletAddressRequestParams(WalletAddressRequest walletAddressRequest) {
     StringBuilder sb=new StringBuilder();
     sb.append(walletAddressRequest.getServer());
