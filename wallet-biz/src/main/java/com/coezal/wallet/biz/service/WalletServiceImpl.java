@@ -1,9 +1,11 @@
 package com.coezal.wallet.biz.service;
 
 import com.coezal.wallet.api.bean.RsaKey;
+import com.coezal.wallet.api.bean.WalletAddressRequest;
 import com.coezal.wallet.api.bean.WalletBean;
 import com.coezal.wallet.biz.wallet.PasswordGenerator;
 import com.coezal.wallet.biz.wallet.WalletGenerator;
+import com.coezal.wallet.common.util.JsonUtil;
 import com.coezal.wallet.common.util.RSACoder;
 import com.coezal.wallet.common.util.StringFormat;
 import com.coezal.wallet.dal.dao.RsaMapper;
@@ -33,10 +35,9 @@ public class WalletServiceImpl implements WalletService {
   @Override
   public String getWalletAddress(String param) {
     try {
-      //@todo  模拟rsa解密数据
-      byte[] bytes = param.getBytes();
-      String ownerInfo = new String(RSACoder.decryptByPrivateKey(param.getBytes(), bytes));
-      if (!StringFormat.isMatchWalletOwnInfo(ownerInfo)) { //参数不是电话或者邮箱
+      String paramJson=RSACoder.decryptByPrivateKey1(param);
+      WalletAddressRequest walletAddressRequest= JsonUtil.decode(paramJson,WalletAddressRequest.class);
+      if (!StringFormat.isMatchWalletOwnInfo(walletAddressRequest.getUsersign())) { //参数不是电话或者邮箱
         WalletBean queryWalletBean = new WalletBean();
         queryWalletBean.setOwnerInfo(param);
         WalletBean hadWalletBean = walletMapper.selectOne(queryWalletBean);

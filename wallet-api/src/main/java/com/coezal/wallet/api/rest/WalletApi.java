@@ -22,7 +22,7 @@ public interface WalletApi {
 
   @ApiOperation(value = "获取钱包地址", notes = "获取钱包地址", protocols = "https")
   @RequestMapping(value = "/getWalletAddress", method = RequestMethod.POST)
-  BaseResponse<String> getWalletAddress(@ApiParam(value = "邮箱或者手机号", required = true) @RequestParam(value = "a") String str);
+  BaseResponse<String> getWalletAddress(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
 
 
 }
