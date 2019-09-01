@@ -1,5 +1,8 @@
 package com.coezal.wallet.biz.service;
 
+import com.coezal.wallet.api.bean.FetchCashResponse;
+import com.coezal.wallet.api.bean.PayCheckResponse;
+
 /**
  * Version 1.0
  * Created by lll on 2019-08-27.
@@ -15,5 +18,17 @@ public interface WalletService {
    */
   String getWalletAddress(String param);
 
+  /**
+   * 校验充值请求是否真实
+   * @param dataStr
+   * @return
+   */
+  PayCheckResponse payCheck(String dataStr);
 
+  /**
+   * 请求提现
+   * @param dataStr
+   * @return
+   */
+  FetchCashResponse fetchCash(String dataStr);
 }

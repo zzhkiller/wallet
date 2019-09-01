@@ -1,5 +1,7 @@
 package com.coezal.wallet;
 
+import com.coezal.wallet.api.bean.FetchCashResponse;
+import com.coezal.wallet.api.bean.PayCheckResponse;
 import com.coezal.wallet.api.rest.WalletApi;
 import com.coezal.wallet.api.vo.base.BaseResponse;
 import com.coezal.wallet.biz.service.WalletService;
@@ -27,6 +29,16 @@ public class WalletController extends AbstractController implements WalletApi {
   @Override
   public BaseResponse<String> getWalletAddress(String str) {
     return buildJson(walletService.getWalletAddress(str));
+  }
+
+  @Override
+  public BaseResponse<PayCheckResponse> payCheck(String dataStr) {
+    return buildJson(walletService.payCheck(dataStr));
+  }
+
+  @Override
+  public BaseResponse<FetchCashResponse> fetchCash(String dataStr) {
+    return buildJson(walletService.fetchCash(dataStr));
   }
 
 }

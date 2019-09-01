@@ -1,5 +1,7 @@
 package com.coezal.wallet.api.rest;
 
+import com.coezal.wallet.api.bean.FetchCashResponse;
+import com.coezal.wallet.api.bean.PayCheckResponse;
 import com.coezal.wallet.api.vo.base.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -7,8 +9,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Version 1.0
@@ -23,6 +23,15 @@ public interface WalletApi {
   @ApiOperation(value = "获取钱包地址", notes = "获取钱包地址", protocols = "https")
   @RequestMapping(value = "/getWalletAddress", method = RequestMethod.POST)
   BaseResponse<String> getWalletAddress(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
+
+  @ApiOperation(value = "校验充值请求是否真实", notes = "校验充值请求是否真实", protocols = "https")
+  @RequestMapping(value = "/paycheck", method = RequestMethod.POST)
+  BaseResponse<PayCheckResponse> payCheck(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
+
+
+  @ApiOperation(value = "请求提现", notes = "fetchCash", protocols = "https")
+  @RequestMapping(value = "/fetchCash", method = RequestMethod.POST)
+  BaseResponse<FetchCashResponse> fetchCash(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
 
 
 }

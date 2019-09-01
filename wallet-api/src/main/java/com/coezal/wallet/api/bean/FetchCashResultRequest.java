@@ -3,8 +3,7 @@ package com.coezal.wallet.api.bean;
 /**
  * 充值成功通知请求对象
  */
-
-public class RechargeRequest {
+public class FetchCashResultRequest {
     private String usersign;
 
     private String checkcode;
@@ -17,7 +16,7 @@ public class RechargeRequest {
 
     private String money;
 
-    private String time;
+    private Integer status;
 
     private String md5chk;
 
@@ -71,12 +70,12 @@ public class RechargeRequest {
         this.money = money;
     }
 
-    public String getTime() {
-        return time;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public String getMd5chk() {
