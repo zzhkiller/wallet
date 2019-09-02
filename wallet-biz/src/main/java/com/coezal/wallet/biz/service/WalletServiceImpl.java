@@ -31,6 +31,7 @@ public class WalletServiceImpl implements WalletService {
 
   @Resource
   RsaMapper rsaMapper;
+
   private static String salt = "gQ#D63K*QW%U9l@X";
 
   @Override
@@ -79,8 +80,6 @@ public class WalletServiceImpl implements WalletService {
       //校验参数
       checkPayCheckRequest(payCheckRequest);
       //todo 业务逻辑
-
-
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -107,6 +106,8 @@ public class WalletServiceImpl implements WalletService {
   @Override
   public List<WalletBean> getAllUserAddresses() {
     //TODO 获取所有用户的钱包地址
+
+
     return null;
   }
 

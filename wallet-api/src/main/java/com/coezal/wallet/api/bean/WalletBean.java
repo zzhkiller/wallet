@@ -17,7 +17,7 @@ public class WalletBean {
   private String password; //生成钱包的秘钥，手机号码或者邮箱
   private String address; //钱包地址;
   private String privateKey;// 钱包私钥;
-  private String mnemonicList;//助记词， 根据生成方式的不同，有可能没有助记词， 助记词之间用,分割
+  private String mnemonicList;//助记词，HD钱包才有， 根据生成方式的不同，有可能没有助记词， 助记词之间用,分割
   private String keyStoreJson;//生成的keystore json文件，如果采用助记词就没有
   private String ownerInfo; // 钱包拥有者信息，电话或者邮箱的MD5
   private String signKey; // 解密私钥

@@ -11,4 +11,7 @@ package com.coezal.wallet.biz.wallet;
  * copyright generalray4239@gmail.com
  */
 public class WalletTransaction {
+
+
+
 }
