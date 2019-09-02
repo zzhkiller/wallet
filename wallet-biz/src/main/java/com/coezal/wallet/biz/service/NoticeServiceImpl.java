@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService {
     private static String salt = "gQ#D63K*QW%U9l@X";
-    @Value("api.domain")
+    @Value("${api.domain}")
     private String domain;
 
     @Override

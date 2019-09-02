@@ -32,13 +32,19 @@ public class WalletServiceImpl implements WalletService {
   @Resource
   RsaMapper rsaMapper;
 
+
   private static String salt = "gQ#D63K*QW%U9l@X";
 
   @Override
   public String getWalletAddress(String param) {
+
+    String paramJson= null;
     try {
-      String paramJson=RSACoder.decryptByPrivateKey1(param);
-      WalletAddressRequest walletAddressRequest= JsonUtil.decode(paramJson,WalletAddressRequest.class);
+      paramJson = RSACoder.decryptByPrivateKey1(param);
+    } catch (Exception e) {
+      throw new BizException("解密参数异常");
+    }
+    WalletAddressRequest walletAddressRequest= JsonUtil.decode(paramJson,WalletAddressRequest.class);
       //校验参数
       checkWalletAddressRequestParams(walletAddressRequest);
 
@@ -58,7 +64,12 @@ public class WalletServiceImpl implements WalletService {
             walletMapper.update(walletBean);//更新钱包数据
             return walletBeanList.get(0).getAddress();
           } else { //钱包地址不够了，重新生成钱包
-            WalletBean walletBean = WalletGenerator.createEthWallet(PasswordGenerator.generatorPassword());
+            WalletBean walletBean = null;
+            try {
+              walletBean = WalletGenerator.createEthWallet(PasswordGenerator.generatorPassword());
+            } catch (Exception e) {
+              throw  new BizException("生成钱包异常");
+            }
             walletBean.setOwnerInfo(param);
             encryptAndInsertWallet(walletBean);
             return walletBean.getAddress();
@@ -67,9 +78,6 @@ public class WalletServiceImpl implements WalletService {
       } else {
         return null;
       }
-    } catch (Exception e) {
-      return null;
-    }
   }
 
   /**

@@ -25,7 +25,7 @@ public class WalletTransactionListenerServiceImpl extends ThirdApiInvoker  imple
 
   private static final Logger logger = LoggerFactory.getLogger("WalletTransactionListenerServiceImpl");
 
-  @Value("eth.scan.url")
+  @Value("${eth.scan.url}")
   private String domain;
 
   /**
