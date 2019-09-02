@@ -2,7 +2,7 @@ package com.coezal.wallet.biz.service;
 
 import com.coezal.wallet.api.bean.RsaKey;
 import com.coezal.wallet.common.util.RSACoder;
-import com.coezal.wallet.dal.dao.RsaMapper;
+import com.coezal.wallet.dal.dao.RsaKeyMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ import java.util.Map;
 public class RsaServiceImpl implements RsaService {
 
   @Resource
-  RsaMapper rsaMapper;
+  RsaKeyMapper rsaMapper;
 
   @Override
   public String getPublicKey() {

@@ -8,8 +8,8 @@ import com.coezal.wallet.common.util.JsonUtil;
 import com.coezal.wallet.common.util.Md5Util;
 import com.coezal.wallet.common.util.RSACoder;
 import com.coezal.wallet.common.util.StringFormat;
-import com.coezal.wallet.dal.dao.RsaMapper;
-import com.coezal.wallet.dal.dao.WalletMapper;
+import com.coezal.wallet.dal.dao.RsaKeyMapper;
+import com.coezal.wallet.dal.dao.WalletBeanMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,10 +27,10 @@ import java.util.Objects;
 public class WalletServiceImpl implements WalletService {
 
   @Resource
-  WalletMapper walletMapper;
+  WalletBeanMapper walletMapper;
 
   @Resource
-  RsaMapper rsaMapper;
+  RsaKeyMapper rsaMapper;
 
 
   private static String salt = "gQ#D63K*QW%U9l@X";
@@ -57,7 +57,7 @@ public class WalletServiceImpl implements WalletService {
           return null;
         } else { //查询联系人地址为空的钱包
           queryWalletBean.setOwnerInfo(null);
-          List<WalletBean> walletBeanList = walletMapper.selectAll(queryWalletBean);
+          List<WalletBean> walletBeanList = walletMapper.select(queryWalletBean);
           if (walletBeanList != null && walletBeanList.size() > 0) {
             WalletBean walletBean = walletBeanList.get(0);
             walletBean.setOwnerInfo(param);

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coezal.wallet.dal.dao.WalletBeanMapper">
+  <resultMap id="BaseResultMap" type="com.coezal.wallet.api.bean.WalletBean">
+    <result column="id" jdbcType="BIGINT" property="id" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="private_key" jdbcType="VARCHAR" property="privateKey" />
+    <result column="mnemonic_list" jdbcType="VARCHAR" property="mnemonicList" />
+    <result column="key_store_json" jdbcType="VARCHAR" property="keyStoreJson" />
+    <result column="owner_info" jdbcType="VARCHAR" property="ownerInfo" />
+    <result column="sign_key" jdbcType="VARCHAR" property="signKey" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, password, address, private_key, mnemonic_list, key_store_json, owner_info, sign_key
+  </sql>
+  <insert id="insert" parameterType="com.coezal.wallet.api.bean.WalletBean">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into wallet
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="password != null">
+        password,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="privateKey != null">
+        private_key,
+      </if>
+      <if test="mnemonicList != null">
+        mnemonic_list,
+      </if>
+      <if test="keyStoreJson != null">
+        key_store_json,
+      </if>
+      <if test="ownerInfo != null">
+        owner_info,
+      </if>
+      <if test="signKey != null">
+        sign_key,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="privateKey != null">
+        #{privateKey,jdbcType=VARCHAR},
+      </if>
+      <if test="mnemonicList != null">
+        #{mnemonicList,jdbcType=VARCHAR},
+      </if>
+      <if test="keyStoreJson != null">
+        #{keyStoreJson,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerInfo != null">
+        #{ownerInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="signKey != null">
+        #{signKey,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.coezal.wallet.api.bean.WalletBean">
+    update wallet
+    <set>
+      <if test="id != null">
+        id = #{id,jdbcType=BIGINT},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="privateKey != null">
+        private_key = #{privateKey,jdbcType=VARCHAR},
+      </if>
+      <if test="mnemonicList != null">
+        mnemonic_list = #{mnemonicList,jdbcType=VARCHAR},
+      </if>
+      <if test="keyStoreJson != null">
+        key_store_json = #{keyStoreJson,jdbcType=VARCHAR},
+      </if>
+      <if test="ownerInfo != null">
+        owner_info = #{ownerInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="signKey != null">
+        sign_key = #{signKey,jdbcType=VARCHAR},
+      </if>
+    </set>
+  </update>
+  <select id="select" parameterType="com.coezal.wallet.api.bean.WalletBean" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from wallet where 1 = 1 
+    <if test="id != null">
+       and id = #{id,jdbcType=BIGINT}
+    </if>
+    <if test="password != null">
+       and password = #{password,jdbcType=VARCHAR}
+    </if>
+    <if test="address != null">
+       and address = #{address,jdbcType=VARCHAR}
+    </if>
+    <if test="privateKey != null">
+       and private_key = #{privateKey,jdbcType=VARCHAR}
+    </if>
+    <if test="mnemonicList != null">
+       and mnemonic_list = #{mnemonicList,jdbcType=VARCHAR}
+    </if>
+    <if test="keyStoreJson != null">
+       and key_store_json = #{keyStoreJson,jdbcType=VARCHAR}
+    </if>
+    <if test="ownerInfo != null">
+       and owner_info = #{ownerInfo,jdbcType=VARCHAR}
+    </if>
+    <if test="signKey != null">
+       and sign_key = #{signKey,jdbcType=VARCHAR}
+    </if>
+  </select>
+  <select id="selectOne" parameterType="com.coezal.wallet.api.bean.WalletBean" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from wallet where 1 = 1 
+    <if test="id != null">
+       and id = #{id,jdbcType=BIGINT}
+    </if>
+    <if test="password != null">
+       and password = #{password,jdbcType=VARCHAR}
+    </if>
+    <if test="address != null">
+       and address = #{address,jdbcType=VARCHAR}
+    </if>
+    <if test="privateKey != null">
+       and private_key = #{privateKey,jdbcType=VARCHAR}
+    </if>
+    <if test="mnemonicList != null">
+       and mnemonic_list = #{mnemonicList,jdbcType=VARCHAR}
+    </if>
+    <if test="keyStoreJson != null">
+       and key_store_json = #{keyStoreJson,jdbcType=VARCHAR}
+    </if>
+    <if test="ownerInfo != null">
+       and owner_info = #{ownerInfo,jdbcType=VARCHAR}
+    </if>
+    <if test="signKey != null">
+       and sign_key = #{signKey,jdbcType=VARCHAR}
+    </if>
+     limit 1 
+  </select>
+</mapper>
