@@ -1,10 +1,11 @@
-package com.coezal.wallet.biz.wallet;
+package com.coezal.wallet.biz.service;
 
 import com.coezal.wallet.api.bean.ApiReq;
 import com.coezal.wallet.api.bean.CheckFetchCashRequest;
 import com.coezal.wallet.api.bean.FetchCashResultRequest;
 import com.coezal.wallet.api.bean.RechargeRequest;
 import com.coezal.wallet.api.vo.base.BaseResponse;
+import com.coezal.wallet.biz.service.NoticeService;
 import com.coezal.wallet.biz.util.ThirdApiInvoker;
 import com.coezal.wallet.common.util.JsonUtil;
 import com.coezal.wallet.common.util.Md5Util;

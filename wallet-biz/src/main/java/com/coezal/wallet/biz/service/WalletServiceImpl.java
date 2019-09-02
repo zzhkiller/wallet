@@ -72,6 +72,11 @@ public class WalletServiceImpl implements WalletService {
     }
   }
 
+  /**
+   * 充值校验
+   * @param dataStr
+   * @return
+   */
   @Override
   public PayCheckResponse payCheck(String dataStr){
     try {
@@ -95,8 +100,6 @@ public class WalletServiceImpl implements WalletService {
       //校验参数
       checkFetchCashRequest(fetchCashRequest);
       //todo 业务逻辑
-
-
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -9,7 +9,7 @@ public class FetchCashRequest {
     private String checkcode;
 
 
-    private String  id;
+    private String id;
 
     private String md5chk;
 

@@ -1,4 +1,4 @@
-package com.coezal.wallet.biz.wallet;
+package com.coezal.wallet.biz.service;
 
 import com.coezal.wallet.api.bean.CheckFetchCashRequest;
 import com.coezal.wallet.api.bean.RechargeRequest;
