@@ -29,7 +29,7 @@ public class WalletController extends AbstractController implements WalletApi {
   private static final Logger logger  = LoggerFactory.getLogger("WalletController");
 
   @Override
-  public BaseResponse<String> getWalletAddress(String str) {
+  public BaseResponse<String> getAddr(String str) {
     return buildJson(walletService.getWalletAddress(str));
   }
 
@@ -41,6 +41,11 @@ public class WalletController extends AbstractController implements WalletApi {
   @Override
   public BaseResponse<FetchCashResponse> fetchCash(String dataStr) {
     return buildJson(walletService.fetchCash(dataStr));
+  }
+
+  @Override
+  public BaseResponse<BaseResponse> paySearch(String dataStr) {
+    return buildJson(walletService.paySearch(dataStr));
   }
 
   @Override

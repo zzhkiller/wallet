@@ -3,6 +3,7 @@ package com.coezal.wallet.biz.service;
 import com.coezal.wallet.api.bean.FetchCashResponse;
 import com.coezal.wallet.api.bean.PayCheckResponse;
 import com.coezal.wallet.api.bean.WalletBean;
+import com.coezal.wallet.api.vo.base.BaseResponse;
 
 import java.util.List;
 
@@ -40,4 +41,11 @@ public interface WalletService {
    * @return
    */
   List<WalletBean> getAllUserAddresses();
+
+  /**
+   * 刷新充值（用户进入主界面，请求是否充值成功）
+   * @param dataStr
+   * @return
+   */
+  BaseResponse paySearch(String dataStr);
 }

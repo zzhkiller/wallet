@@ -1,9 +1,8 @@
 package com.coezal.wallet.biz.service;
 
-import com.coezal.wallet.api.bean.CheckFetchCashRequest;
+import com.coezal.wallet.api.bean.request.CheckFetchCashRequest;
 import com.coezal.wallet.api.bean.RechargeRequest;
-import com.coezal.wallet.api.bean.FetchCashResultRequest;
-import com.coezal.wallet.api.vo.base.BaseResponse;
+import com.coezal.wallet.api.bean.request.FetchCashResultRequest;
 
 public interface NoticeService {
     /**

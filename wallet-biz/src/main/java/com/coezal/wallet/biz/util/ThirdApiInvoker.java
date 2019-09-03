@@ -157,7 +157,7 @@ public class ThirdApiInvoker {
             } else {
                 responseEntity = restTemplate.exchange(url, method, requestEntity, String.class, params);
             }
-//            logger.info("response : {}", responseEntity.getBody());
+            System.out.println("----response : {}"+responseEntity.getBody());
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
                 if(clazz.equals(String.class)){
                     return (T)responseEntity.getBody();
@@ -196,8 +196,8 @@ public class ThirdApiInvoker {
     private static RestTemplate initRestTemplate() {
 
         HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        httpRequestFactory.setConnectTimeout(2000);
-        httpRequestFactory.setReadTimeout(6000);
+        httpRequestFactory.setConnectTimeout(15000);
+        httpRequestFactory.setReadTimeout(15000);
         RestTemplate rest = new RestTemplate(httpRequestFactory);
         List<HttpMessageConverter<?>> messageConverters = rest.getMessageConverters();
         for (int i = 0; i < messageConverters.size(); i++) {

@@ -1,4 +1,4 @@
-package com.coezal.wallet.api.bean;
+package com.coezal.wallet.api.bean.request;
 
 import java.io.Serializable;
 

@@ -17,6 +17,17 @@ public class Token {
   private String tokenSymbol;
   private String tokenABI;
 
+  public Token() {
+  }
+
+  public Token(String tokenContractAddress, int tokenDecimals, String tokenName, String tokenSymbol, String tokenABI) {
+    this.tokenContractAddress = tokenContractAddress;
+    this.tokenDecimals = tokenDecimals;
+    this.tokenName = tokenName;
+    this.tokenSymbol = tokenSymbol;
+    this.tokenABI = tokenABI;
+  }
+
   public String getTokenContractAddress() {
     return tokenContractAddress;
   }

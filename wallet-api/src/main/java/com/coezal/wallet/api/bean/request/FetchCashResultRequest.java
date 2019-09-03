@@ -1,4 +1,4 @@
-package com.coezal.wallet.api.bean;
+package com.coezal.wallet.api.bean.request;
 
 /**
  * 充值成功通知请求对象
