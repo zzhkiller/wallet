@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coezal.wallet.dal.dao.TokenMapper">
+  <resultMap id="BaseResultMap" type="com.coezal.wallet.api.bean.Token">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="token_contract_address" jdbcType="VARCHAR" property="tokenContractAddress" />
+    <result column="token_decimals" jdbcType="VARCHAR" property="tokenDecimals" />
+    <result column="token_name" jdbcType="VARCHAR" property="tokenName" />
+    <result column="token_symbol" jdbcType="VARCHAR" property="tokenSymbol" />
+    <result column="token_aBI" jdbcType="VARCHAR" property="tokenABI" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, token_contract_address, token_decimals, token_name, token_symbol, token_aBI
+  </sql>
+  <insert id="insert" parameterType="com.coezal.wallet.api.bean.Token">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into token
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="tokenContractAddress != null">
+        token_contract_address,
+      </if>
+      <if test="tokenDecimals != null">
+        token_decimals,
+      </if>
+      <if test="tokenName != null">
+        token_name,
+      </if>
+      <if test="tokenSymbol != null">
+        token_symbol,
+      </if>
+      <if test="tokenAbi != null">
+        token_aBI,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="tokenContractAddress != null">
+        #{tokenContractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenDecimals != null">
+        #{tokenDecimals,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenName != null">
+        #{tokenName,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenSymbol != null">
+        #{tokenSymbol,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenAbi != null">
+        #{tokenAbi,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.coezal.wallet.api.bean.Token">
+    update token
+    <set>
+      <if test="tokenContractAddress != null">
+        token_contract_address = #{tokenContractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenDecimals != null">
+        token_decimals = #{tokenDecimals,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenName != null">
+        token_name = #{tokenName,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenSymbol != null">
+        token_symbol = #{tokenSymbol,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenAbi != null">
+        token_aBI = #{tokenAbi,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <delete id="deleteById" parameterType="java.lang.Long">
+    delete from token
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from token
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="select" parameterType="com.coezal.wallet.api.bean.Token" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from token where 1 = 1 
+    <if test="tokenContractAddress != null">
+       and token_contract_address = #{tokenContractAddress,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenDecimals != null">
+       and token_decimals = #{tokenDecimals,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenName != null">
+       and token_name = #{tokenName,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenSymbol != null">
+       and token_symbol = #{tokenSymbol,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenAbi != null">
+       and token_aBI = #{tokenAbi,jdbcType=VARCHAR}
+    </if>
+  </select>
+  <select id="selectOne" parameterType="com.coezal.wallet.api.bean.Token" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from token where 1 = 1 
+    <if test="tokenContractAddress != null">
+       and token_contract_address = #{tokenContractAddress,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenDecimals != null">
+       and token_decimals = #{tokenDecimals,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenName != null">
+       and token_name = #{tokenName,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenSymbol != null">
+       and token_symbol = #{tokenSymbol,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenAbi != null">
+       and token_aBI = #{tokenAbi,jdbcType=VARCHAR}
+    </if>
+     limit 1 
+  </select>
+</mapper>

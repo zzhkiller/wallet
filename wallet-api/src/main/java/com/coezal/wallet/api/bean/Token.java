@@ -10,7 +10,7 @@ package com.coezal.wallet.api.bean;
  * copyright generalray4239@gmail.com
  */
 public class Token {
-
+  private Long id;
   private String tokenContractAddress;
   private int tokenDecimals;
   private String tokenName;
@@ -66,5 +66,13 @@ public class Token {
 
   public void setTokenABI(String tokenABI) {
     this.tokenABI = tokenABI;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 }
