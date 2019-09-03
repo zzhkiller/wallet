@@ -32,7 +32,7 @@ public class TokenTranscation {
    *
    *
    */
-
+  private Long id;
   private String blockNumber;
   private String timeStamp;
   private String hash;
@@ -104,6 +104,14 @@ public class TokenTranscation {
 
   public void setContractAddress(String contractAddress) {
     this.contractAddress = contractAddress;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
   }
 
   @Override
