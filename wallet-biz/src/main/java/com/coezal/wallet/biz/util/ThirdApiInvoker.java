@@ -1,7 +1,9 @@
 package com.coezal.wallet.biz.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.coezal.wallet.api.bean.TokenTransaction;
 import com.coezal.wallet.api.excetion.BizException;
+import com.coezal.wallet.api.vo.base.ETHScanBaseResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
@@ -149,6 +151,28 @@ public class ThirdApiInvoker {
     }
 
 
+    protected final ETHScanBaseResponse<List<TokenTransaction>> getETHScanBaseResponse(String url, HttpEntity<String> requestEntity, Class clazz, Map<String, Object> params) {
+        try {
+            ResponseEntity<String> responseEntity;
+            HttpMethod method=HttpMethod.GET;
+            if (params == null) {
+                responseEntity = restTemplate.exchange(url, method, requestEntity, String.class);
+            } else {
+                responseEntity = restTemplate.exchange(url, method, requestEntity, String.class, params);
+            }
+            System.out.println("----response : {}"+responseEntity.getBody());
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                ETHScanBaseResponse<List<TokenTransaction>> t = (ETHScanBaseResponse<List<TokenTransaction>>) JSONObject.parseObject(responseEntity.getBody(), clazz);
+                return t;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new BizException(e.getMessage());
+        }
+    }
+
     protected final <T> T doHttpRequest(String url, HttpMethod method, HttpEntity<String> requestEntity, Class<T> clazz, Map<String, Object> params) {
         try {
             ResponseEntity<String> responseEntity;
@@ -174,6 +198,9 @@ public class ThirdApiInvoker {
             throw new BizException(e.getMessage());
         }
     }
+
+
+
 
     private HttpHeaders makeHttpHeaders(Map<String, String> headers) {
         HttpHeaders httpHeaders = new HttpHeaders();
