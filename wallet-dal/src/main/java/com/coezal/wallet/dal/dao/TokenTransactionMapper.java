@@ -1,7 +1,6 @@
 package com.coezal.wallet.dal.dao;
 
 import com.coezal.wallet.api.bean.TokenTransaction;
-import com.coezal.wallet.api.bean.WalletBean;
 
 import java.util.List;
 
