@@ -31,7 +31,7 @@
         token_symbol,
       </if>
       <if test="tokenABI != null">
-        token_aBI,
+        token_abi,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -48,7 +48,7 @@
         #{tokenSymbol,jdbcType=VARCHAR},
       </if>
       <if test="tokenABI != null">
-        #{tokenAbi,jdbcType=VARCHAR},
+        #{tokenABI,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -68,7 +68,7 @@
         token_symbol = #{tokenSymbol,jdbcType=VARCHAR},
       </if>
       <if test="tokenABI != null">
-        token_aBI = #{tokenAbi,jdbcType=VARCHAR},
+        token_abi = #{tokenABI,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -100,7 +100,7 @@
        and token_symbol = #{tokenSymbol,jdbcType=VARCHAR}
     </if>
     <if test="tokenABI != null">
-       and token_aBI = #{tokenAbi,jdbcType=VARCHAR}
+       and token_abi = #{tokenABI,jdbcType=VARCHAR}
     </if>
   </select>
   <select id="selectOne" parameterType="com.coezal.wallet.api.bean.Token" resultMap="BaseResultMap">
@@ -120,7 +120,7 @@
        and token_symbol = #{tokenSymbol,jdbcType=VARCHAR}
     </if>
     <if test="tokenABI != null">
-       and token_aBI = #{tokenAbi,jdbcType=VARCHAR}
+       and token_abi = #{tokenABI,jdbcType=VARCHAR}
     </if>
      limit 1 
   </select>
