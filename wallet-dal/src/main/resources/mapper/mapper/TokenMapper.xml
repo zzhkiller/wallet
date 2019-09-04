@@ -7,7 +7,7 @@
     <result column="token_decimals" jdbcType="VARCHAR" property="tokenDecimals" />
     <result column="token_name" jdbcType="VARCHAR" property="tokenName" />
     <result column="token_symbol" jdbcType="VARCHAR" property="tokenSymbol" />
-    <result column="token_aBI" jdbcType="VARCHAR" property="tokenABI" />
+    <result column="token_abi" jdbcType="VARCHAR" property="tokenABI" />
   </resultMap>
   <sql id="Base_Column_List">
     id, token_contract_address, token_decimals, token_name, token_symbol, token_aBI
@@ -30,7 +30,7 @@
       <if test="tokenSymbol != null">
         token_symbol,
       </if>
-      <if test="tokenAbi != null">
+      <if test="tokenABI != null">
         token_aBI,
       </if>
     </trim>
@@ -47,7 +47,7 @@
       <if test="tokenSymbol != null">
         #{tokenSymbol,jdbcType=VARCHAR},
       </if>
-      <if test="tokenAbi != null">
+      <if test="tokenABI != null">
         #{tokenAbi,jdbcType=VARCHAR},
       </if>
     </trim>
@@ -67,7 +67,7 @@
       <if test="tokenSymbol != null">
         token_symbol = #{tokenSymbol,jdbcType=VARCHAR},
       </if>
-      <if test="tokenAbi != null">
+      <if test="tokenABI != null">
         token_aBI = #{tokenAbi,jdbcType=VARCHAR},
       </if>
     </set>
@@ -99,7 +99,7 @@
     <if test="tokenSymbol != null">
        and token_symbol = #{tokenSymbol,jdbcType=VARCHAR}
     </if>
-    <if test="tokenAbi != null">
+    <if test="tokenABI != null">
        and token_aBI = #{tokenAbi,jdbcType=VARCHAR}
     </if>
   </select>
@@ -119,7 +119,7 @@
     <if test="tokenSymbol != null">
        and token_symbol = #{tokenSymbol,jdbcType=VARCHAR}
     </if>
-    <if test="tokenAbi != null">
+    <if test="tokenABI != null">
        and token_aBI = #{tokenAbi,jdbcType=VARCHAR}
     </if>
      limit 1 
