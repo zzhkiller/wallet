@@ -55,7 +55,7 @@ public class WalletServiceImpl implements WalletService {
 
     String paramJson = null;
     try {
-      paramJson = RSACoder.decryptByPrivateKey1(param);
+      paramJson = RSACoder.decryptAPIParams(param);
     } catch (Exception e) {
       throw new BizException("解密参数异常");
     }
@@ -80,9 +80,9 @@ public class WalletServiceImpl implements WalletService {
           return walletBean.getAddress();
         } else { //钱包地址不够了，重新生成钱包
           try {
-            WalletBean walletBean = WalletGenerator.createEthWallet(PasswordGenerator.generatorPassword());
+            WalletBean walletBean = WalletGenerator.createHDWallet();
             walletBean.setOwnerInfo(walletAddressRequest.getUsersign() + "|" + walletAddressRequest.getCheckcode());
-            encryptAndInsertWallet(walletBean);
+            walletMapper.insert(walletBean);
             return walletBean.getAddress();
           } catch (Exception e) {
             throw new BizException("生成钱包异常"+ e.getMessage());
@@ -102,7 +102,7 @@ public class WalletServiceImpl implements WalletService {
   @Override
   public PayCheckResponse payCheck(String dataStr) {
     try {
-      String paramJson = RSACoder.decryptByPrivateKey1(dataStr);
+      String paramJson = RSACoder.decryptAPIParams(dataStr);
       PayCheckRequest payCheckRequest = JsonUtil.decode(paramJson, PayCheckRequest.class);
       //校验参数
       checkPayCheckRequest(payCheckRequest);
@@ -136,7 +136,7 @@ public class WalletServiceImpl implements WalletService {
   @Override
   public FetchCashResponse fetchCash(String dataStr) {
     try {
-      String paramJson=RSACoder.decryptByPrivateKey1(dataStr);
+      String paramJson=RSACoder.decryptAPIParams(dataStr);
       FetchCashRequest fetchCashRequest= JsonUtil.decode(paramJson, FetchCashRequest.class);
       //校验参数
       checkFetchCashRequest(fetchCashRequest);
@@ -161,7 +161,7 @@ public class WalletServiceImpl implements WalletService {
   @Override
   public BaseResponse paySearch(String dataStr) {
     try {
-      String paramJson = RSACoder.decryptByPrivateKey1(dataStr);
+      String paramJson = RSACoder.decryptAPIParams(dataStr);
       PaySearchRequest paySearchRequest= JsonUtil.decode(paramJson, PaySearchRequest.class);
       checkPaySearchRequest(paySearchRequest);//校验参数
       //查询token 对应的contract address
@@ -278,17 +278,5 @@ public class WalletServiceImpl implements WalletService {
       throw new BizException("加密错误");
     }
   }
-
-
-  private void encryptAndInsertWallet(WalletBean walletBean){
-    List<RsaKey> rsaKeyList = rsaMapper.select(null);
-
-    walletBean.setSignKey(rsaKeyList.get(0).getPrivateKey());
-//    RSACoder.encryptByPublicKey( ,)
-//    walletBean.setPassword();
-
-    walletMapper.insert(walletBean);//插入钱包数据
-  }
-
 
 }

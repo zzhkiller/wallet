@@ -14,7 +14,7 @@ import java.util.List;
 public class WalletBean {
 
   private Long id;// 主键id
-  private String password; //生成钱包的秘钥，手机号码或者邮箱
+  private String password; //生成钱包的秘钥
   private String address; //钱包地址;
   private String privateKey;// 钱包私钥;
   private String mnemonicList;//助记词，HD钱包才有， 根据生成方式的不同，有可能没有助记词， 助记词之间用,分割

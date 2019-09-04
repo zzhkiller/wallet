@@ -14,6 +14,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.HashMap;
 import java.util.Map;
@@ -137,16 +138,26 @@ public class RSACoder {
     cipher.init(Cipher.DECRYPT_MODE, privateKey);
     return cipher.doFinal(data);
   }
+
+  /**
+   * api 服务参数解密
+   * @param data
+   * @return
+   * @throws Exception
+   */
+  public static String decryptAPIParams(String data) throws Exception{
+    byte[] key=Base64.decodeBase64(PRIVATE_KEY_STR);
+    return decryptMultiDataByPrivateKey(data,key);
+  }
+
   /**
    * 私钥分段解密
    *
-   * @param data 待解密数据
+   * @param data 待解密数据  采用了base 64 处理的字符串。
    * @param key  密钥
-   * @return byte[] 解密数据
+   * @return String 解密数据
    */
-  public static String decryptByPrivateKey1(String data) throws Exception {
-    //秘钥
-    byte[] key=Base64.decodeBase64(PRIVATE_KEY_STR);
+  public static String decryptMultiDataByPrivateKey(String data, byte[] key) throws Exception {
     PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(key);
     KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
     //生成私钥
@@ -175,8 +186,8 @@ public class RSACoder {
     byteArrayOutputStream.close();
     byte[] byteArray = byteArrayOutputStream.toByteArray();
     return new String(byteArray);
-
   }
+
   /**
    * 私钥分段加密
    *
@@ -184,7 +195,7 @@ public class RSACoder {
    * @param key       密钥
    * @return byte[] 加密数据
    */
-  public static String encryptByPrivateKey1(String data, byte[] key) throws Exception {
+  public static String encryptMultiDataByPrivateKey(String data, byte[] key) throws Exception {
 
     //取得私钥
     PKCS8EncodedKeySpec pkcs8KeySpec = new PKCS8EncodedKeySpec(key);
@@ -194,6 +205,37 @@ public class RSACoder {
     //数据加密
     Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
     cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+    return encryptMultiDataByCipher(data, cipher);
+  }
+
+
+  /**
+   * 公钥分段加密
+   * @param data
+   * @param key
+   * @return 返回一段base64处理的加密数据
+   * @throws Exception
+   */
+  public static String encryptMultiDataByPublicKey(String data, byte[] key) throws Exception {
+    //取得公钥
+    X509EncodedKeySpec pkcs8KeySpec = new X509EncodedKeySpec(key);
+    KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+    //生成私钥
+    PublicKey publicKey = keyFactory.generatePublic(pkcs8KeySpec);
+    //数据加密
+    Cipher cipher = Cipher.getInstance(keyFactory.getAlgorithm());
+    cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+    return encryptMultiDataByCipher(data, cipher);
+  }
+
+  /**
+   * rsa 加密长数据
+   * @param data
+   * @param cipher
+   * @return  返回 加密后的字符串 [加密内容使用base64进行编码,并以UTF-8为标准转化成字符串]
+   * @throws Exception
+   */
+  private static String encryptMultiDataByCipher(String data, Cipher cipher) throws Exception {
     int inputLen = data.getBytes().length;
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     int offset = 0;
@@ -212,10 +254,10 @@ public class RSACoder {
     }
     byte[] encryptedData = out.toByteArray();
     out.close();
-    // 获取加密内容使用base64进行编码,并以UTF-8为标准转化成字符串
-    // 加密后的字符串
-    return new String(Base64.encodeBase64String(encryptedData));
+    return Base64.encodeBase64String(encryptedData);
   }
+
+
   /**
    * 公钥解密
    *
@@ -328,12 +370,29 @@ public class RSACoder {
       String privateKeyStr="MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIrzh97MQKMEmANyDX+X1NG7DTszFgMbO6KlfincsifH+29hXROZORQIFQCUVphbng6AdzDh+KTYdgphKXbNWoSrYQupLH+ZccREDnRI/x8VGneCBGTotcyL02SWJxpXpUsD//eNOWgi495mNnmooZ1J0NY3Nk7c0cZ0sSXPR6RbAgMBAAECgYALDgD7SsjBr3XgoExOoGfAH9+XnCLeMGZ4NC5rajGKVLC+VcKv8nrGCzaQizywdmmGwdW5v+CmTMpnXP+Nghz3Xx6vbfKLA93jxPEYayg7LxqvZMpz9MZjf8h8zWugkAQD6/ElFj0KiLJoysdiqN70nCnRojod1ka0ZEiZRIUGwQJBAMC1XYiMfan29qVHV/K3fIUyzI/PMzyQJWTm/SNFd3jvEZopagrvYkxRC7koLoeCvKslcQ2O4gzgpdY+iqPVEBECQQC4llgsghu9v1zZW+kp9gQz5pAp/cYvOS5DTZctVjJzpgZaXmg5a6qgOWPzD8tDm1GW/TQP1yVOMmVO9SHXYFmrAkBWPZQjNMRUGOqeYsQwIf8+2NIFFbQXSWcCtgDZFRB3dX3KIPiM9j5mauq1LQ9No6ttaC8k4ym0m6B7tbdzxDkRAkBh+SKp1REmYIjGsbsLU5IdfhYsw47Kh94fSPKh1KuIqKmck5lcSOJSksOTQmHP64Od0Z0tfzNE0wjkpMWmjHRrAkAUyDj0xyN99WfU099LzNmed4KJyKCspgfwZXE+afgplXrw3TBnM1ZngfZJuvEPOAZ2sMAai3CjESFra5Z1cvCx";
       String code1 = "";
       try {
-        code1 = RSACoder.encryptByPrivateKey1(jsonObj, Base64.decodeBase64(privateKeyStr));
+//        code1 = RSACoder.encryptMultiDataByPrivateKey(jsonObj, Base64.decodeBase64(privateKeyStr));
+
+        byte[] key = Base64.decodeBase64("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCK84fezECjBJgDcg1/l9TRuw07MxYDGzuipX4p3LInx/tvYV0TmTkUCBUAlFaYW54OgHcw4fik2HYKYSl2zVqEq2ELqSx/mXHERA50SP8fFRp3ggRk6LXMi9NklicaV6VLA//3jTloIuPeZjZ5qKGdSdDWNzZO3NHGdLElz0ekWwIDAQAB");
+
+        String  encrykey = Base64.encodeBase64String(RSACoder.encryptByPublicKey("wallet.coezal.com.io".getBytes(),key));
+
+        System.out.println("加密后的数据key ===" + encrykey);
+
+        String src = new String(RSACoder.decryptByPrivateKey(Base64.decodeBase64(encrykey),Base64.decodeBase64(privateKeyStr)));
+        System.out.println("解密后的数据key ===" + src);
       } catch (Exception e) {
         e.printStackTrace();
       }
       System.out.println("加密后的数据：" +code1);
-    }
+
+
+
+  }
+
+
+
+
+
 //public static void main(String[] args) {
 //  String privateKeyStr="MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIrzh97MQKMEmANyDX+X1NG7DTszFgMbO6KlfincsifH+29hXROZORQIFQCUVphbng6AdzDh+KTYdgphKXbNWoSrYQupLH+ZccREDnRI/x8VGneCBGTotcyL02SWJxpXpUsD//eNOWgi495mNnmooZ1J0NY3Nk7c0cZ0sSXPR6RbAgMBAAECgYALDgD7SsjBr3XgoExOoGfAH9+XnCLeMGZ4NC5rajGKVLC+VcKv8nrGCzaQizywdmmGwdW5v+CmTMpnXP+Nghz3Xx6vbfKLA93jxPEYayg7LxqvZMpz9MZjf8h8zWugkAQD6/ElFj0KiLJoysdiqN70nCnRojod1ka0ZEiZRIUGwQJBAMC1XYiMfan29qVHV/K3fIUyzI/PMzyQJWTm/SNFd3jvEZopagrvYkxRC7koLoeCvKslcQ2O4gzgpdY+iqPVEBECQQC4llgsghu9v1zZW+kp9gQz5pAp/cYvOS5DTZctVjJzpgZaXmg5a6qgOWPzD8tDm1GW/TQP1yVOMmVO9SHXYFmrAkBWPZQjNMRUGOqeYsQwIf8+2NIFFbQXSWcCtgDZFRB3dX3KIPiM9j5mauq1LQ9No6ttaC8k4ym0m6B7tbdzxDkRAkBh+SKp1REmYIjGsbsLU5IdfhYsw47Kh94fSPKh1KuIqKmck5lcSOJSksOTQmHP64Od0Z0tfzNE0wjkpMWmjHRrAkAUyDj0xyN99WfU099LzNmed4KJyKCspgfwZXE+afgplXrw3TBnM1ZngfZJuvEPOAZ2sMAai3CjESFra5Z1cvCx";
 //
