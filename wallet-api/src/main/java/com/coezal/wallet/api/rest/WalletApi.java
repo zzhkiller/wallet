@@ -7,6 +7,7 @@ import com.coezal.wallet.api.vo.base.BaseResponse;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +26,7 @@ public interface WalletApi {
 
   @ApiOperation(value = "获取钱包地址", notes = "获取钱包地址", protocols = "https")
   @RequestMapping(value = "/getaddr", method = RequestMethod.POST)
-  BaseResponse<String> getAddr(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
+  BaseResponse<String> getAddr( @ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
 
   @ApiOperation(value = "校验充值请求是否真实", notes = "校验充值请求是否真实", protocols = "https")
   @RequestMapping(value = "/paycheck", method = RequestMethod.POST)
