@@ -68,8 +68,9 @@ public class WalletServiceImpl implements WalletService {
       queryWalletBean.setOwnerInfo(walletAddressRequest.getUsersign() + "|" + walletAddressRequest.getCheckcode());
       WalletBean hadWalletBean = walletMapper.selectOne(queryWalletBean);
       if (hadWalletBean != null) {
-        //抛出异常，用户钱包已经存在了，一个用户只能有一个钱包
-        throw new BizException("用户已经存在了");
+//        //抛出异常，用户钱包已经存在了，一个用户只能有一个钱包
+//        throw new BizException("用户已经存在了");
+        return hadWalletBean.getAddress();
       } else { //查询联系人地址为空的钱包
         queryWalletBean.setOwnerInfo(null);
         List<WalletBean> walletBeanList = walletMapper.select(queryWalletBean);
