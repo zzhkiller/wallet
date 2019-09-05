@@ -37,7 +37,7 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
             apiReq.setDatastr(RSACoder.encryptAPIParams(jsonObj));
             System.out.println("rechargeNotice==="+jsonObj);
             System.out.println("rechargeNotice==="+apiReq.getDatastr());
-            BaseResponse baseResponse = doHttpPost(domain + "/api/pay/paynotice", BaseResponse.class, null, apiReq);
+            BaseResponse baseResponse = doHttpPost(domain + "/api/pay/paynotice", BaseResponse.class, null, apiReq.getDatastr());
             if (baseResponse.getCode() == 0) {
                 return Boolean.TRUE;
             }
@@ -62,7 +62,7 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
             apiReq.setDatastr(RSACoder.encryptAPIParams(jsonObj));
             System.out.println("rechargeNotice==="+jsonObj);
             System.out.println("rechargeNotice==="+apiReq.getDatastr());
-            BaseResponse baseResponse = doHttpPost(domain + "/api/pay/getcheck", BaseResponse.class, null, apiReq);
+            BaseResponse baseResponse = doHttpPost(domain + "/api/pay/getcheck", BaseResponse.class, null, apiReq.getDatastr());
             if (baseResponse.getCode() == 0) {
                 return Boolean.TRUE;
             }
@@ -91,7 +91,7 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
             apiReq.setDatastr(RSACoder.encryptAPIParams(jsonObj));
             System.out.println("rechargeNotice==="+jsonObj);
             System.out.println("rechargeNotice==="+apiReq.getDatastr());
-            BaseResponse baseResponse = doHttpPost(domain + "/api/pay/getnotice", BaseResponse.class, null, apiReq);
+            BaseResponse baseResponse = doHttpPost(domain + "/api/pay/getnotice", BaseResponse.class, null, apiReq.getDatastr());
             if (baseResponse.getCode() == 0) {
                 return Boolean.TRUE;
             }

@@ -13,6 +13,8 @@ import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Type;
@@ -67,7 +69,7 @@ public class ThirdApiInvoker {
 
     protected final <T> T doHttpGet(String url, Class<T> clazz, Map<String, String> headers, Map<String, Object> params) {
         HttpHeaders httpHeaders = makeHttpHeaders(headers);
-        HttpEntity<String> requestEntity = new HttpEntity<String>(httpHeaders);
+        HttpEntity requestEntity = new HttpEntity<String>(httpHeaders);
 //        logger.info("request : urlTemplate={}, params={}, headers={}", url, gson.toJson(params), gson.toJson(headers));
         return doHttpRequest(url, HttpMethod.GET, requestEntity, clazz, params);
     }
@@ -143,11 +145,14 @@ public class ThirdApiInvoker {
     }
 
 
-    protected final <T> T doHttpPost(String url, Class<T> clazz, Map<String, String> headers, Object bodyObj) {
+    protected final <T> T doHttpPost(String url, Class<T> clazz, Map<String, String> headers, String rasStr) {
         HttpHeaders httpHeaders = makeHttpHeaders(headers);
-        String body = gson.toJson(bodyObj);
-        HttpEntity<String> requestEntity = new HttpEntity<String>(body, httpHeaders);
-        logger.info("request : url={}, params={}, headers={}",url,body,gson.toJson(headers));
+        httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        MultiValueMap<String, String> params= new LinkedMultiValueMap<String, String>();
+//  也支持中文
+        params.add("datastr", rasStr);
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(params, httpHeaders);
+        logger.info("request : url={}, params={}, headers={}",url,params,gson.toJson(headers));
         return doHttpRequest(url, HttpMethod.POST, requestEntity, clazz, null);
     }
 
@@ -174,7 +179,7 @@ public class ThirdApiInvoker {
         }
     }
 
-    protected final <T> T doHttpRequest(String url, HttpMethod method, HttpEntity<String> requestEntity, Class<T> clazz, Map<String, Object> params) {
+    protected final <T> T doHttpRequest(String url, HttpMethod method, HttpEntity requestEntity, Class<T> clazz, Map<String, Object> params) {
         try {
             ResponseEntity<String> responseEntity;
             if (params == null) {
@@ -207,7 +212,6 @@ public class ThirdApiInvoker {
         HttpHeaders httpHeaders = new HttpHeaders();
 //        MediaType type = MediaType.parseMediaType(MediaType.APPLICATION_JSON + ";charset=UTF-8");
 //        httpHeaders.setContentType(type);
-
         if (headers != null) {
             for (Map.Entry<String, String> entry : headers.entrySet()) {
                 httpHeaders.set(entry.getKey(), entry.getValue());
