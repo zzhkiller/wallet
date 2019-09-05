@@ -12,7 +12,7 @@ package com.coezal.wallet.api.bean;
 public class Token {
   private Long id;
   private String tokenContractAddress;
-  private int tokenDecimals;
+  private Integer tokenDecimals;
   private String tokenName;
   private String tokenSymbol;
   private String tokenABI;
@@ -36,13 +36,6 @@ public class Token {
     this.tokenContractAddress = tokenContractAddress;
   }
 
-  public int getTokenDecimals() {
-    return tokenDecimals;
-  }
-
-  public void setTokenDecimals(int tokenDecimals) {
-    this.tokenDecimals = tokenDecimals;
-  }
 
   public String getTokenName() {
     return tokenName;
@@ -75,4 +68,25 @@ public class Token {
   public void setId(Long id) {
     this.id = id;
   }
+
+  public Integer getTokenDecimals() {
+    return tokenDecimals;
+  }
+
+  public void setTokenDecimals(Integer tokenDecimals) {
+    this.tokenDecimals = tokenDecimals;
+  }
+
+  @Override
+  public String toString() {
+    return "Token{" +
+            "id=" + id +
+            ", tokenContractAddress='" + tokenContractAddress + '\'' +
+            ", tokenDecimals=" + tokenDecimals +
+            ", tokenName='" + tokenName + '\'' +
+            ", tokenSymbol='" + tokenSymbol + '\'' +
+            ", tokenABI='" + tokenABI + '\'' +
+            '}';
+  }
 }
+

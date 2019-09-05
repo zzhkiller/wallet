@@ -15,6 +15,8 @@ import com.coezal.wallet.dal.dao.RsaKeyMapper;
 import com.coezal.wallet.dal.dao.TokenMapper;
 import com.coezal.wallet.dal.dao.TokenTransactionMapper;
 import com.coezal.wallet.dal.dao.WalletBeanMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -36,9 +38,6 @@ public class WalletServiceImpl implements WalletService {
   WalletBeanMapper walletMapper;
 
   @Resource
-  RsaKeyMapper rsaMapper;
-
-  @Resource
   TokenTransactionMapper tokenTransactionMapper;
 
   @Resource
@@ -49,6 +48,8 @@ public class WalletServiceImpl implements WalletService {
 
 
   private static String salt = "gQ#D63K*QW%U9l@X";
+
+  private static final Logger logger = LoggerFactory.getLogger("WalletServiceImpl");
 
   @Override
   public GetAddressResponse getWalletAddress(String param) {
@@ -111,12 +112,7 @@ public class WalletServiceImpl implements WalletService {
       //校验参数
       checkPayCheckRequest(payCheckRequest);
       //第一步：校验用户是否存在钱包地址：
-      WalletBean bean = new WalletBean();
-      bean.setOwnerInfo(payCheckRequest.getUsersign() + "|" + payCheckRequest.getCheckcode());
-      WalletBean resultBean = walletMapper.selectOne(bean);
-      if (resultBean == null || resultBean.getAddress() == null) {
-        throw new BizException(payCheckRequest.getUsersign() + "没有钱包地址");
-      }
+      WalletBean bean = getUserWalletBean(payCheckRequest.getUsersign() + "|" + payCheckRequest.getCheckcode());
 
       TokenTransaction transaction = new TokenTransaction();
       transaction.setTo(bean.getAddress());
@@ -164,76 +160,77 @@ public class WalletServiceImpl implements WalletService {
    */
   @Override
   public BaseResponse paySearch(String dataStr) {
+    PaySearchRequest paySearchRequest;
     try {
       String paramJson = RSACoder.decryptAPIParams(dataStr);
-      PaySearchRequest paySearchRequest= JsonUtil.decode(paramJson, PaySearchRequest.class);
+      paySearchRequest = JsonUtil.decode(paramJson, PaySearchRequest.class);
+      logger.info("paySearch", paySearchRequest.toString());
+      System.out.println(paySearchRequest.toString());
       checkPaySearchRequest(paySearchRequest);//校验参数
-      //查询token 对应的contract address
-      Token token = new Token();
-      token.setTokenSymbol(paySearchRequest.getTokenname());
-      Token resultToken  = tokenMapper.selectOne(token);
-      if(resultToken == null || token.getTokenContractAddress() == null){
-        // 报错，没有找到token数据
-        throw new BizException("没有找到对应的token");
-      }
-      WalletBean bean = new WalletBean();
-      bean.setOwnerInfo(paySearchRequest.getUsersign()+"|"+paySearchRequest.getCheckcode());
-      WalletBean resultBean = walletMapper.selectOne(bean);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new BizException("解密参数异常");
+    }
+    //查询token 对应的contract address
+    Token token = new Token();
+    token.setTokenSymbol(paySearchRequest.getTokenname());
+    Token resultToken = tokenMapper.selectOne(token);
+    System.out.println(resultToken.toString());
+    if (resultToken == null || resultToken.getTokenContractAddress() == null) {
+      // 报错，没有找到token数据
+      throw new BizException("没有找到对应的token");
+    }
 
-      if(resultBean == null || resultBean.getAddress() == null){
-        throw new BizException(paySearchRequest.getUsersign()+"没有钱包地址");
-      }
+    WalletBean resultBean = getUserWalletBean(paySearchRequest.getUsersign() + "|" + paySearchRequest.getCheckcode());
 
-      new Thread(){
-        @Override
-        public void run() {
-          try {
-            TokenTransaction queryT = new TokenTransaction();
-            queryT.setTo(resultBean.getAddress());
-            TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
-            WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
-            String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
-            if(balance != null && !balance.equals(0)){ //用户余额不为0
-              List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
-              if (transactionList == null || transactionList.size() > 0) { //
-                for(TokenTransaction transaction: transactionList){
-                  if (transaction.getTo().equals(resultBean.getAddress())) { //如果是转入
-                    if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
-                      //存储到数据库，通知api有充值
-                      tokenTransactionMapper.update(transaction);
-                      RechargeRequest rechargeRequest = new RechargeRequest();
-                      rechargeRequest.setUsersign(paySearchRequest.getUsersign());
-                      rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
-                      rechargeRequest.setId(transaction.getHash());
-                      rechargeRequest.setTokenname(transaction.getTokenSymbol());
-                      rechargeRequest.setTime(transaction.getTimeStamp());
-                      rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
-                      noticeService.rechargeNotice(rechargeRequest);
-                    } else if (lastToken == null) {
-                      tokenTransactionMapper.insert(transaction);//插入数据
-                      //通知API有充值
-                      RechargeRequest rechargeRequest = new RechargeRequest();
-                      rechargeRequest.setUsersign(paySearchRequest.getUsersign());
-                      rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
-                      rechargeRequest.setId(transaction.getHash());
-                      rechargeRequest.setTokenname(transaction.getTokenSymbol());
-                      rechargeRequest.setTime(transaction.getTimeStamp());
-                      rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
-                      noticeService.rechargeNotice(rechargeRequest);
-                    }
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          TokenTransaction queryT = new TokenTransaction();
+          queryT.setTo(resultBean.getAddress());
+          TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
+          WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
+          String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
+          if (balance != null && !balance.equals(0)) { //用户余额不为0
+            List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
+            if (transactionList == null || transactionList.size() > 0) { //
+              for (TokenTransaction transaction : transactionList) {
+                if (transaction.getTo().equals(resultBean.getAddress())) { //如果是转入
+                  if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
+                    tokenTransactionMapper.update(transaction);//存储到数据库，
+                  } else if (lastToken == null) {
+                    tokenTransactionMapper.insert(transaction);//插入数据
                   }
+                  //通知api有充值
+                  RechargeRequest rechargeRequest = new RechargeRequest();
+                  rechargeRequest.setUsersign(paySearchRequest.getUsersign());
+                  rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
+                  rechargeRequest.setId(transaction.getHash());
+                  rechargeRequest.setTokenname(transaction.getTokenSymbol());
+                  rechargeRequest.setTime(transaction.getTimeStamp());
+                  rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
+                  noticeService.rechargeNotice(rechargeRequest);
                 }
               }
             }
-          } catch (Exception e) {
-            throw new BizException(e.getMessage());
           }
+        } catch (Exception e) {
+          throw new BizException(e.getMessage());
         }
-      }.start();
-      return new BaseResponse();
-    } catch (Exception e) {
-      throw new BizException("解密参数异常");
+      }
+    }.start();
+    return new BaseResponse();
+  }
+
+  private WalletBean getUserWalletBean(String usrInfo) {
+    WalletBean bean = new WalletBean();
+    bean.setOwnerInfo(usrInfo);
+    WalletBean resultBean = walletMapper.selectOne(bean);
+    if (resultBean == null || resultBean.getAddress() == null) {
+      throw new BizException(usrInfo + "没有钱包地址");
     }
+    return resultBean;
   }
 
   private void checkWalletAddressRequestParams(WalletAddressRequest walletAddressRequest) {

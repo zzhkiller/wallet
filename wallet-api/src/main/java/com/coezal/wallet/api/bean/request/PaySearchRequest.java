@@ -64,4 +64,15 @@ public class PaySearchRequest {
   public void setMd5chk(String md5chk) {
     this.md5chk = md5chk;
   }
+
+  @Override
+  public String toString() {
+    return "PaySearchRequest{" +
+            "server='" + server + '\'' +
+            ", usersign='" + usersign + '\'' +
+            ", checkcode='" + checkcode + '\'' +
+            ", tokenname='" + tokenname + '\'' +
+            ", md5chk='" + md5chk + '\'' +
+            '}';
+  }
 }

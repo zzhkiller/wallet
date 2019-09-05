@@ -31,12 +31,13 @@ public class WalletInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
-    String source = request.getHeader("source");
-    if (source != null && source.equalsIgnoreCase(SOURCE_MD5)) {
-      return true;
-    } else {
-      return false;
-    }
+//    String source = request.getHeader("source");
+//    if (source != null && source.equalsIgnoreCase(SOURCE_MD5)) {
+//      return true;
+//    } else {
+//
+//    }
+    return false;
   }
 
   @Override
