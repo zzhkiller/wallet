@@ -26,10 +26,10 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
         sb.append(rechargeRequest.getId());
         sb.append(rechargeRequest.getTokenname());
         sb.append(rechargeRequest.getWallet());
-
         sb.append(rechargeRequest.getMoney());
         sb.append(rechargeRequest.getTime());
         sb.append(salt);
+        System.out.println("rechargeNotice===str--------"+sb.toString());
         rechargeRequest.setMd5chk(Md5Util.MD5(sb.toString()));
         String jsonObj = JsonUtil.encode(rechargeRequest);
         ApiReq apiReq = new ApiReq();

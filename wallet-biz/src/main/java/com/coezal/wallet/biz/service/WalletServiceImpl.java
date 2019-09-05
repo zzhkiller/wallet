@@ -21,8 +21,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
 
 /**
  * Version 1.0
@@ -164,7 +166,7 @@ public class WalletServiceImpl implements WalletService {
     try {
       String paramJson = RSACoder.decryptAPIParams(dataStr);
       paySearchRequest = JsonUtil.decode(paramJson, PaySearchRequest.class);
-      logger.info("paySearch", paySearchRequest.toString());
+      logger.info("paySearch===="+ paySearchRequest.toString());
       System.out.println(paySearchRequest.toString());
       checkPaySearchRequest(paySearchRequest);//校验参数
     } catch (Exception e) {
@@ -181,55 +183,59 @@ public class WalletServiceImpl implements WalletService {
       throw new BizException("没有找到对应的token");
     }
 
-    RechargeRequest rechargeRequest = new RechargeRequest();
-    rechargeRequest.setUsersign(paySearchRequest.getUsersign());
-    rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
-    rechargeRequest.setId("dafdafdsafds");
-    rechargeRequest.setTokenname("USDT");
-    rechargeRequest.setTime("1234567666");
-    rechargeRequest.setMoney("40000");
-    noticeService.rechargeNotice(rechargeRequest);
-
-
     WalletBean resultBean = getUserWalletBean(paySearchRequest.getUsersign() + "|" + paySearchRequest.getCheckcode());
     logger.info(resultBean.toString());
-    new Thread() {
-      @Override
-      public void run() {
-        try {
-          TokenTransaction queryT = new TokenTransaction();
-          queryT.setTo(resultBean.getAddress());
-          TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
-          WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
-          String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
-          if (balance != null && !balance.equals("0")) { //用户余额不为0
-            List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
-            if (transactionList == null || transactionList.size() > 0) { //
-              for (TokenTransaction transaction : transactionList) {
-                if (transaction.getTo().equals(resultBean.getAddress())) { //如果是转入
-                  if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
-                    tokenTransactionMapper.update(transaction);//存储到数据库，
-                  } else if (lastToken == null) {
-                    tokenTransactionMapper.insert(transaction);//插入数据
+
+    if (paySearchRequest.getServer().equals("test")) {
+      RechargeRequest rechargeRequest = new RechargeRequest();
+      rechargeRequest.setUsersign(paySearchRequest.getUsersign());
+      rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
+      rechargeRequest.setId("dafdafdsafds");
+      rechargeRequest.setTokenname("USDT");
+      rechargeRequest.setWallet(resultBean.getAddress());
+      rechargeRequest.setTime(new Date().getTime() + "");
+      rechargeRequest.setMoney("4000");
+      noticeService.rechargeNotice(rechargeRequest);
+    } else {
+      new Thread() { //开启线程池
+        @Override
+        public void run() {
+          try {
+            TokenTransaction queryT = new TokenTransaction();
+            queryT.setTo(resultBean.getAddress());
+            TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
+            WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
+            String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
+            if (balance != null && !balance.equals("0")) { //用户余额不为0
+              List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
+              if (transactionList == null || transactionList.size() > 0) { //
+                for (TokenTransaction transaction : transactionList) {
+                  if (transaction.getTo().equals(resultBean.getAddress())) { //如果是转入
+                    if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
+                      tokenTransactionMapper.update(transaction);//存储到数据库，
+                    } else if (lastToken == null) {
+                      tokenTransactionMapper.insert(transaction);//插入数据
+                    }
+                    //通知api有充值
+                    RechargeRequest rechargeRequest = new RechargeRequest();
+                    rechargeRequest.setUsersign(paySearchRequest.getUsersign());
+                    rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
+                    rechargeRequest.setId(transaction.getHash());
+                    rechargeRequest.setTokenname(transaction.getTokenSymbol());
+                    rechargeRequest.setWallet(resultBean.getAddress());
+                    rechargeRequest.setTime(transaction.getTimeStamp());
+                    rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
+                    noticeService.rechargeNotice(rechargeRequest);
                   }
-                  //通知api有充值
-                  RechargeRequest rechargeRequest = new RechargeRequest();
-                  rechargeRequest.setUsersign(paySearchRequest.getUsersign());
-                  rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
-                  rechargeRequest.setId(transaction.getHash());
-                  rechargeRequest.setTokenname(transaction.getTokenSymbol());
-                  rechargeRequest.setTime(transaction.getTimeStamp());
-                  rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
-                  noticeService.rechargeNotice(rechargeRequest);
                 }
               }
             }
+          } catch (Exception e) {
+            throw new BizException(e.getMessage());
           }
-        } catch (Exception e) {
-          throw new BizException(e.getMessage());
         }
-      }
-    }.start();
+      }.start();
+    }
   }
 
   private WalletBean getUserWalletBean(String usrInfo) {
