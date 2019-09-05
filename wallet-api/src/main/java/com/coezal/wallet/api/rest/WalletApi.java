@@ -27,20 +27,20 @@ public interface WalletApi {
 
   @ApiOperation(value = "获取钱包地址", notes = "获取钱包地址", protocols = "https")
   @RequestMapping(value = "/getaddr", method = RequestMethod.POST)
-  BaseResponse<GetAddressResponse> getAddr(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
+  BaseResponse<GetAddressResponse> getAddr(@ApiParam(value = "请求", required = true) @RequestParam(value = "datastr") String dataStr);
 
   @ApiOperation(value = "校验充值请求是否真实", notes = "校验充值请求是否真实", protocols = "https")
   @RequestMapping(value = "/paycheck", method = RequestMethod.POST)
-  BaseResponse<PayCheckResponse> payCheck(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
+  BaseResponse<PayCheckResponse> payCheck(@ApiParam(value = "请求", required = true) @RequestParam(value = "datastr") String dataStr);
 
 
   @ApiOperation(value = "请求提现", notes = "fetchCash", protocols = "https")
   @RequestMapping(value = "/fetchCash", method = RequestMethod.POST)
-  BaseResponse<FetchCashResponse> fetchCash(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
+  BaseResponse<FetchCashResponse> fetchCash(@ApiParam(value = "请求", required = true) @RequestParam(value = "datastr") String dataStr);
 
   @ApiOperation(value = "刷新用户充值记录", notes = "paySearch", protocols = "https")
   @RequestMapping(value = "/paysearch", method = RequestMethod.POST)
-  BaseResponse<BaseResponse> paySearch(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
+  BaseResponse<BaseResponse> paySearch(@ApiParam(value = "请求", required = true) @RequestParam(value = "datastr") String dataStr);
 
 
   @ApiOperation(value = "所有用户的钱包地址", notes = "所有用户的钱包地址", protocols = "https")
