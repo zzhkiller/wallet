@@ -11,9 +11,6 @@ import java.io.Serializable;
 public class BaseResponse<T> implements Serializable {
 
 	private static final long serialVersionUID = 3478493193648267325L;
-	
-	@ApiModelProperty(required=true)
-	private boolean success;
 	@ApiModelProperty(required=false)
 	private String msg;
 	@ApiModelProperty(required=false)
@@ -73,14 +70,6 @@ public class BaseResponse<T> implements Serializable {
     public void setCode(Integer code) {
         this.code = code;
     }
-
-    public boolean isSuccess() {
-		return success;
-	}
-
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
 
 	public String getMsg() {
 		return msg;
