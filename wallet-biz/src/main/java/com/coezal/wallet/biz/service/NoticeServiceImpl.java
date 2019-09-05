@@ -8,6 +8,7 @@ import com.coezal.wallet.api.vo.base.BaseResponse;
 import com.coezal.wallet.biz.util.ThirdApiInvoker;
 import com.coezal.wallet.common.util.JsonUtil;
 import com.coezal.wallet.common.util.Md5Util;
+import com.coezal.wallet.common.util.RSACoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +33,10 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
         rechargeRequest.setMd5chk(Md5Util.MD5(sb.toString()));
         String jsonObj = JsonUtil.encode(rechargeRequest);
         ApiReq apiReq = new ApiReq();
-        apiReq.setDatastr(jsonObj);
         try {
+            apiReq.setDatastr(RSACoder.encryptAPIParams(jsonObj));
+            System.out.println("rechargeNotice==="+jsonObj);
+            System.out.println("rechargeNotice==="+apiReq.getDatastr());
             BaseResponse baseResponse = doHttpPost(domain + "/api/pay/paynotice", BaseResponse.class, null, apiReq);
             if (baseResponse.getCode() == 0) {
                 return Boolean.TRUE;
@@ -55,8 +58,10 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
         checkFetchCashRequest.setMd5chk(Md5Util.MD5(sb.toString()));
         String jsonObj = JsonUtil.encode(checkFetchCashRequest);
         ApiReq apiReq = new ApiReq();
-        apiReq.setDatastr(jsonObj);
         try {
+            apiReq.setDatastr(RSACoder.encryptAPIParams(jsonObj));
+            System.out.println("rechargeNotice==="+jsonObj);
+            System.out.println("rechargeNotice==="+apiReq.getDatastr());
             BaseResponse baseResponse = doHttpPost(domain + "/api/pay/getcheck", BaseResponse.class, null, apiReq);
             if (baseResponse.getCode() == 0) {
                 return Boolean.TRUE;
@@ -82,8 +87,10 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
         fetchCashResultRequest.setMd5chk(Md5Util.MD5(sb.toString()));
         String jsonObj = JsonUtil.encode(fetchCashResultRequest);
         ApiReq apiReq = new ApiReq();
-        apiReq.setDatastr(jsonObj);
         try {
+            apiReq.setDatastr(RSACoder.encryptAPIParams(jsonObj));
+            System.out.println("rechargeNotice==="+jsonObj);
+            System.out.println("rechargeNotice==="+apiReq.getDatastr());
             BaseResponse baseResponse = doHttpPost(domain + "/api/pay/getnotice", BaseResponse.class, null, apiReq);
             if (baseResponse.getCode() == 0) {
                 return Boolean.TRUE;

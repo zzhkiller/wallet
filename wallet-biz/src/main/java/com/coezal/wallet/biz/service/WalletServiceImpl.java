@@ -181,8 +181,18 @@ public class WalletServiceImpl implements WalletService {
       throw new BizException("没有找到对应的token");
     }
 
-    WalletBean resultBean = getUserWalletBean(paySearchRequest.getUsersign() + "|" + paySearchRequest.getCheckcode());
+    RechargeRequest rechargeRequest = new RechargeRequest();
+    rechargeRequest.setUsersign(paySearchRequest.getUsersign());
+    rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
+    rechargeRequest.setId("dafdafdsafds");
+    rechargeRequest.setTokenname("usdt");
+    rechargeRequest.setTime("1234567666");
+    rechargeRequest.setMoney("40000");
+    noticeService.rechargeNotice(rechargeRequest);
 
+
+    WalletBean resultBean = getUserWalletBean(paySearchRequest.getUsersign() + "|" + paySearchRequest.getCheckcode());
+    logger.info(resultBean.toString());
     new Thread() {
       @Override
       public void run() {
@@ -192,7 +202,7 @@ public class WalletServiceImpl implements WalletService {
           TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
           WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
           String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
-          if (balance != null && !balance.equals(0)) { //用户余额不为0
+          if (balance != null && !balance.equals("0")) { //用户余额不为0
             List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
             if (transactionList == null || transactionList.size() > 0) { //
               for (TokenTransaction transaction : transactionList) {

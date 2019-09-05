@@ -190,6 +190,17 @@ public class RSACoder {
 
   /**
    * 私钥分段加密
+   * @param data
+   * @return
+   * @throws Exception
+   */
+  public static String encryptAPIParams(String data) throws Exception{
+    byte[] key=Base64.decodeBase64(PRIVATE_KEY_STR);
+    return encryptMultiDataByPrivateKey(data,key);
+  }
+
+  /**
+   * 私钥分段加密
    *
    * @param data 待加密数据
    * @param key       密钥

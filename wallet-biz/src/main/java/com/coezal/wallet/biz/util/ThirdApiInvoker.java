@@ -7,6 +7,7 @@ import com.coezal.wallet.api.vo.base.ETHScanBaseResponse;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ThirdApiInvoker {
-    protected final Logger logger =null;
+    protected final Logger logger = LoggerFactory.getLogger("ThirdApiInvoker");
     private final RestTemplate restTemplate = initRestTemplate();
     private Gson gson = initGson();
 
@@ -146,7 +147,7 @@ public class ThirdApiInvoker {
         HttpHeaders httpHeaders = makeHttpHeaders(headers);
         String body = gson.toJson(bodyObj);
         HttpEntity<String> requestEntity = new HttpEntity<String>(body, httpHeaders);
-//        logger.info("request : url={}, params={}, headers={}",url,body,gson.toJson(headers));
+        logger.info("request : url={}, params={}, headers={}",url,body,gson.toJson(headers));
         return doHttpRequest(url, HttpMethod.POST, requestEntity, clazz, null);
     }
 
