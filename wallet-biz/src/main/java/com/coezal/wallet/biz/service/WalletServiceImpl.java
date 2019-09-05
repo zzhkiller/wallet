@@ -159,7 +159,7 @@ public class WalletServiceImpl implements WalletService {
    * @return
    */
   @Override
-  public BaseResponse paySearch(String dataStr) {
+  public void paySearch(String dataStr) {
     PaySearchRequest paySearchRequest;
     try {
       String paramJson = RSACoder.decryptAPIParams(dataStr);
@@ -220,7 +220,6 @@ public class WalletServiceImpl implements WalletService {
         }
       }
     }.start();
-    return new BaseResponse();
   }
 
   private WalletBean getUserWalletBean(String usrInfo) {

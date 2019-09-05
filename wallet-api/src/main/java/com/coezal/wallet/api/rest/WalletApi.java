@@ -40,7 +40,7 @@ public interface WalletApi {
 
   @ApiOperation(value = "刷新用户充值记录", notes = "paySearch", protocols = "https")
   @RequestMapping(value = "/paysearch", method = RequestMethod.POST)
-  BaseResponse<BaseResponse> paySearch(@ApiParam(value = "请求", required = true) @RequestParam(value = "datastr") String dataStr);
+  BaseResponse<String> paySearch(@ApiParam(value = "请求", required = true) @RequestParam(value = "datastr") String dataStr);
 
 
   @ApiOperation(value = "所有用户的钱包地址", notes = "所有用户的钱包地址", protocols = "https")

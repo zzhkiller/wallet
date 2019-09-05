@@ -48,5 +48,5 @@ public interface WalletService {
    * @param dataStr
    * @return
    */
-  BaseResponse paySearch(String dataStr);
+  void paySearch(String dataStr);
 }

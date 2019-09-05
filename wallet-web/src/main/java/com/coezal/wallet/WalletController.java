@@ -45,8 +45,9 @@ public class WalletController extends AbstractController implements WalletApi {
   }
 
   @Override
-  public BaseResponse<BaseResponse> paySearch(String dataStr) {
-    return buildJson(walletService.paySearch(dataStr));
+  public BaseResponse<String> paySearch(String dataStr) {
+    walletService.paySearch(dataStr);
+    return buildJson("");
   }
 
   @Override
