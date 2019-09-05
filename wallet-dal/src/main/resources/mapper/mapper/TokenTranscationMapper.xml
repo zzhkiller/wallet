@@ -6,14 +6,14 @@
     <result column="block_number" jdbcType="VARCHAR" property="blockNumber" />
     <result column="time_stamp" jdbcType="VARCHAR" property="timeStamp" />
     <result column="hash" jdbcType="VARCHAR" property="hash" />
-    <result column="from" jdbcType="VARCHAR" property="from" />
-    <result column="to" jdbcType="VARCHAR" property="to" />
-    <result column="value" jdbcType="VARCHAR" property="value" />
+    <result column="from_adr" jdbcType="VARCHAR" property="from" />
+    <result column="to_adr" jdbcType="VARCHAR" property="to" />
+    <result column="change_value" jdbcType="VARCHAR" property="value" />
     <result column="is_error" jdbcType="VARCHAR" property="isError" />
     <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, block_number, time_stamp, hash, from, to, value, is_error, contract_address
+    id, block_number, time_stamp, hash, from_adr, to_adr, change_value, is_error, contract_address
   </sql>
   <insert id="insert" parameterType="com.coezal.wallet.api.bean.TokenTransaction">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -30,14 +30,14 @@
       <if test="hash != null">
         hash,
       </if>
-      <if test="from != null">
-        from,
+      <if test="from_adr != null">
+        from_adr,
       </if>
-      <if test="to != null">
-        to,
+      <if test="to_adr != null">
+        to_adr,
       </if>
       <if test="value != null">
-        value,
+        change_value,
       </if>
       <if test="isError != null">
         is_error,
@@ -57,13 +57,13 @@
         #{hash,jdbcType=VARCHAR},
       </if>
       <if test="from != null">
-        #{from,jdbcType=VARCHAR},
+        #{from_adr,jdbcType=VARCHAR},
       </if>
       <if test="to != null">
-        #{to,jdbcType=VARCHAR},
+        #{to_adr,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
-        #{value,jdbcType=VARCHAR},
+        #{change_value,jdbcType=VARCHAR},
       </if>
       <if test="isError != null">
         #{isError,jdbcType=VARCHAR},
@@ -86,13 +86,13 @@
         hash = #{hash,jdbcType=VARCHAR},
       </if>
       <if test="from != null">
-        from = #{from,jdbcType=VARCHAR},
+        from_adr = #{from,jdbcType=VARCHAR},
       </if>
       <if test="to != null">
-        to = #{to,jdbcType=VARCHAR},
+        to_adr = #{to,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
-        value = #{value,jdbcType=VARCHAR},
+        change_value = #{value,jdbcType=VARCHAR},
       </if>
       <if test="isError != null">
         is_error = #{isError,jdbcType=VARCHAR},
@@ -127,13 +127,13 @@
        and hash = #{hash,jdbcType=VARCHAR}
     </if>
     <if test="from != null">
-       and from = #{from,jdbcType=VARCHAR}
+       and from_adr = #{from,jdbcType=VARCHAR}
     </if>
     <if test="to != null">
-       and to = #{to,jdbcType=VARCHAR}
+       and to_adr = #{to,jdbcType=VARCHAR}
     </if>
     <if test="value != null">
-       and value = #{value,jdbcType=VARCHAR}
+       and change_value = #{value,jdbcType=VARCHAR}
     </if>
     <if test="isError != null">
        and is_error = #{isError,jdbcType=VARCHAR}
@@ -156,13 +156,13 @@
        and hash = #{hash,jdbcType=VARCHAR}
     </if>
     <if test="from != null">
-       and from = #{from,jdbcType=VARCHAR}
+       and from_adr = #{from,jdbcType=VARCHAR}
     </if>
     <if test="to != null">
-       and to = #{to,jdbcType=VARCHAR}
+       and to_adr = #{to,jdbcType=VARCHAR}
     </if>
     <if test="value != null">
-       and value = #{value,jdbcType=VARCHAR}
+       and change_value = #{value,jdbcType=VARCHAR}
     </if>
     <if test="isError != null">
        and is_error = #{isError,jdbcType=VARCHAR}

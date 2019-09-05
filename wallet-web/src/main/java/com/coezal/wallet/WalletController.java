@@ -30,23 +30,23 @@ public class WalletController extends AbstractController implements WalletApi {
   private static final Logger logger  = LoggerFactory.getLogger("WalletController");
 
   @Override
-  public BaseResponse<GetAddressResponse> getAddr(String str) {
-    return buildJson(walletService.getWalletAddress(str));
+  public BaseResponse<GetAddressResponse> getAddr(String datastr) {
+    return buildJson(walletService.getWalletAddress(datastr));
   }
 
   @Override
-  public BaseResponse<PayCheckResponse> payCheck(String dataStr) {
-    return buildJson(walletService.payCheck(dataStr));
+  public BaseResponse<PayCheckResponse> payCheck(String datastr) {
+    return buildJson(walletService.payCheck(datastr));
   }
 
   @Override
-  public BaseResponse<FetchCashResponse> fetchCash(String dataStr) {
-    return buildJson(walletService.fetchCash(dataStr));
+  public BaseResponse<FetchCashResponse> fetchCash(String datastr) {
+    return buildJson(walletService.fetchCash(datastr));
   }
 
   @Override
-  public BaseResponse<String> paySearch(String dataStr) {
-    walletService.paySearch(dataStr);
+  public BaseResponse<String> paySearch(String datastr) {
+    walletService.paySearch(datastr);
     return buildJson("");
   }
 
