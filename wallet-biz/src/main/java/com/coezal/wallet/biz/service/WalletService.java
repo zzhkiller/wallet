@@ -1,6 +1,7 @@
 package com.coezal.wallet.biz.service;
 
 import com.coezal.wallet.api.bean.FetchCashResponse;
+import com.coezal.wallet.api.bean.GetAddressResponse;
 import com.coezal.wallet.api.bean.PayCheckResponse;
 import com.coezal.wallet.api.bean.WalletBean;
 import com.coezal.wallet.api.vo.base.BaseResponse;
@@ -20,7 +21,7 @@ public interface WalletService {
    * @param param  电话或者邮箱地址
    * @return
    */
-  String getWalletAddress(String param);
+  GetAddressResponse getWalletAddress(String param);
 
   /**
    * 校验充值请求是否真实

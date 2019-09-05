@@ -1,6 +1,7 @@
 package com.coezal.wallet.api.rest;
 
 import com.coezal.wallet.api.bean.FetchCashResponse;
+import com.coezal.wallet.api.bean.GetAddressResponse;
 import com.coezal.wallet.api.bean.PayCheckResponse;
 import com.coezal.wallet.api.bean.WalletBean;
 import com.coezal.wallet.api.vo.base.BaseResponse;
@@ -26,7 +27,7 @@ public interface WalletApi {
 
   @ApiOperation(value = "获取钱包地址", notes = "获取钱包地址", protocols = "https")
   @RequestMapping(value = "/getaddr", method = RequestMethod.POST)
-  BaseResponse<String> getAddr( @ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
+  BaseResponse<GetAddressResponse> getAddr(@ApiParam(value = "请求", required = true) @RequestParam(value = "dataStr") String dataStr);
 
   @ApiOperation(value = "校验充值请求是否真实", notes = "校验充值请求是否真实", protocols = "https")
   @RequestMapping(value = "/paycheck", method = RequestMethod.POST)

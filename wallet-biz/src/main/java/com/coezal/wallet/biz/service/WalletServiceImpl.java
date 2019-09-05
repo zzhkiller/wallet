@@ -51,7 +51,7 @@ public class WalletServiceImpl implements WalletService {
   private static String salt = "gQ#D63K*QW%U9l@X";
 
   @Override
-  public String getWalletAddress(String param) {
+  public GetAddressResponse getWalletAddress(String param) {
 
     String paramJson = null;
     try {
@@ -71,21 +71,24 @@ public class WalletServiceImpl implements WalletService {
         //抛出异常，用户钱包已经存在了，一个用户只能有一个钱包
         throw new BizException("用户已经存在了");
       } else { //查询联系人地址为空的钱包
+        GetAddressResponse response = new GetAddressResponse();
         queryWalletBean.setOwnerInfo(null);
         List<WalletBean> walletBeanList = walletMapper.select(queryWalletBean);
         if (walletBeanList != null && walletBeanList.size() > 0) {
           WalletBean walletBean = walletBeanList.get(0);
           walletBean.setOwnerInfo(walletAddressRequest.getUsersign() + "|" + walletAddressRequest.getCheckcode());
           walletMapper.update(walletBean);//更新钱包数据
-          return walletBean.getAddress();
+          response.setWallet(walletBean.getAddress());
+          return response;
         } else { //钱包地址不够了，重新生成钱包
           try {
             WalletBean walletBean = WalletGenerator.createHDWallet();
             walletBean.setOwnerInfo(walletAddressRequest.getUsersign() + "|" + walletAddressRequest.getCheckcode());
             walletMapper.insert(walletBean);
-            return walletBean.getAddress();
+            response.setWallet(walletBean.getAddress());
+            return response;
           } catch (Exception e) {
-            throw new BizException("生成钱包异常"+ e.getMessage());
+            throw new BizException("生成钱包异常" + e.getMessage());
           }
         }
       }
