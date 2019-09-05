@@ -185,7 +185,7 @@ public class WalletServiceImpl implements WalletService {
     rechargeRequest.setUsersign(paySearchRequest.getUsersign());
     rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
     rechargeRequest.setId("dafdafdsafds");
-    rechargeRequest.setTokenname("usdt");
+    rechargeRequest.setTokenname("USDT");
     rechargeRequest.setTime("1234567666");
     rechargeRequest.setMoney("40000");
     noticeService.rechargeNotice(rechargeRequest);
