@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coezal.wallet.dal.dao.FetchCashMapper">
+  <resultMap id="BaseResultMap" type="com.coezal.wallet.api.bean.FetchCash">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="code" jdbcType="BIGINT" property="code" />
+    <result column="server" jdbcType="VARCHAR" property="server" />
+    <result column="user_sign" jdbcType="VARCHAR" property="userSign" />
+    <result column="check_code" jdbcType="VARCHAR" property="checkCode" />
+    <result column="token_name" jdbcType="VARCHAR" property="tokenName" />
+    <result column="wallet" jdbcType="VARCHAR" property="wallet" />
+    <result column="money" jdbcType="REAL" property="money" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="md5chk" jdbcType="VARCHAR" property="md5chk" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, code, server, user_sign, check_code, token_name, wallet, money, time, md5chk
+  </sql>
+  <insert id="insert" parameterType="com.coezal.wallet.api.bean.FetchCash">
+    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into fetch_cash
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        code,
+      </if>
+      <if test="server != null">
+        server,
+      </if>
+      <if test="userSign != null">
+        user_sign,
+      </if>
+      <if test="checkCode != null">
+        check_code,
+      </if>
+      <if test="tokenName != null">
+        token_name,
+      </if>
+      <if test="wallet != null">
+        wallet,
+      </if>
+      <if test="money != null">
+        money,
+      </if>
+      <if test="time != null">
+        time,
+      </if>
+      <if test="md5chk != null">
+        md5chk,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="code != null">
+        #{code,jdbcType=BIGINT},
+      </if>
+      <if test="server != null">
+        #{server,jdbcType=VARCHAR},
+      </if>
+      <if test="userSign != null">
+        #{userSign,jdbcType=VARCHAR},
+      </if>
+      <if test="checkCode != null">
+        #{checkCode,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenName != null">
+        #{tokenName,jdbcType=VARCHAR},
+      </if>
+      <if test="wallet != null">
+        #{wallet,jdbcType=VARCHAR},
+      </if>
+      <if test="money != null">
+        #{money,jdbcType=REAL},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="md5chk != null">
+        #{md5chk,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="update" parameterType="com.coezal.wallet.api.bean.FetchCash">
+    update fetch_cash
+    <set>
+      <if test="code != null">
+        code = #{code,jdbcType=BIGINT},
+      </if>
+      <if test="server != null">
+        server = #{server,jdbcType=VARCHAR},
+      </if>
+      <if test="userSign != null">
+        user_sign = #{userSign,jdbcType=VARCHAR},
+      </if>
+      <if test="checkCode != null">
+        check_code = #{checkCode,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenName != null">
+        token_name = #{tokenName,jdbcType=VARCHAR},
+      </if>
+      <if test="wallet != null">
+        wallet = #{wallet,jdbcType=VARCHAR},
+      </if>
+      <if test="money != null">
+        money = #{money,jdbcType=REAL},
+      </if>
+      <if test="time != null">
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="md5chk != null">
+        md5chk = #{md5chk,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <delete id="deleteById" parameterType="java.lang.Long">
+    delete from fetch_cash
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fetch_cash
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="select" parameterType="com.coezal.wallet.api.bean.FetchCash" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fetch_cash where 1 = 1 
+    <if test="code != null">
+       and code = #{code,jdbcType=BIGINT}
+    </if>
+    <if test="server != null">
+       and server = #{server,jdbcType=VARCHAR}
+    </if>
+    <if test="userSign != null">
+       and user_sign = #{userSign,jdbcType=VARCHAR}
+    </if>
+    <if test="checkCode != null">
+       and check_code = #{checkCode,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenName != null">
+       and token_name = #{tokenName,jdbcType=VARCHAR}
+    </if>
+    <if test="wallet != null">
+       and wallet = #{wallet,jdbcType=VARCHAR}
+    </if>
+    <if test="money != null">
+       and money = #{money,jdbcType=REAL}
+    </if>
+    <if test="time != null">
+       and time = #{time,jdbcType=TIMESTAMP}
+    </if>
+    <if test="md5chk != null">
+       and md5chk = #{md5chk,jdbcType=VARCHAR}
+    </if>
+  </select>
+  <select id="selectOne" parameterType="com.coezal.wallet.api.bean.FetchCash" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fetch_cash where 1 = 1 
+    <if test="code != null">
+       and code = #{code,jdbcType=BIGINT}
+    </if>
+    <if test="server != null">
+       and server = #{server,jdbcType=VARCHAR}
+    </if>
+    <if test="userSign != null">
+       and user_sign = #{userSign,jdbcType=VARCHAR}
+    </if>
+    <if test="checkCode != null">
+       and check_code = #{checkCode,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenName != null">
+       and token_name = #{tokenName,jdbcType=VARCHAR}
+    </if>
+    <if test="wallet != null">
+       and wallet = #{wallet,jdbcType=VARCHAR}
+    </if>
+    <if test="money != null">
+       and money = #{money,jdbcType=REAL}
+    </if>
+    <if test="time != null">
+       and time = #{time,jdbcType=TIMESTAMP}
+    </if>
+    <if test="md5chk != null">
+       and md5chk = #{md5chk,jdbcType=VARCHAR}
+    </if>
+     limit 1 
+  </select>
+</mapper>
