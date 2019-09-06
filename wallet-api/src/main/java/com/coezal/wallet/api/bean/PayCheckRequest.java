@@ -53,4 +53,15 @@ public class PayCheckRequest {
     public void setMd5chk(String md5chk) {
         this.md5chk = md5chk;
     }
+
+    @Override
+    public String toString() {
+        return "PayCheckRequest{" +
+                "server='" + server + '\'' +
+                ", usersign='" + usersign + '\'' +
+                ", checkcode='" + checkcode + '\'' +
+                ", id='" + id + '\'' +
+                ", md5chk='" + md5chk + '\'' +
+                '}';
+    }
 }

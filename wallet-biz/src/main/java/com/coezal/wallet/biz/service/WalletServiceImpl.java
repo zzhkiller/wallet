@@ -115,23 +115,34 @@ public class WalletServiceImpl implements WalletService {
       checkPayCheckRequest(payCheckRequest);
       //第一步：校验用户是否存在钱包地址：
       WalletBean bean = getUserWalletBean(payCheckRequest.getUsersign() + "|" + payCheckRequest.getCheckcode());
-
-      TokenTransaction transaction = new TokenTransaction();
-      transaction.setTo(bean.getAddress());
-      transaction.setHash(payCheckRequest.getId());
-
-      TokenTransaction result = tokenTransactionMapper.selectOne(transaction);
-      if (result != null || result.getValue() != null) {
+      logger.info("paycheck===" + payCheckRequest.toString());
+      if (payCheckRequest.getServer().equals("test")) {
         PayCheckResponse response = new PayCheckResponse();
-        response.setTime(result.getTimeStamp());
-        response.setTokenname(result.getTokenSymbol());
+        response.setTime(new Date().getTime() + "");
+        response.setTokenname("USDT");
         response.setWallet(bean.getAddress());
+        response.setMoney("4000");
         return response;
       } else {
-        throw new BizException(payCheckRequest.getId() + "该充值不存在");
+        TokenTransaction transaction = new TokenTransaction();
+        transaction.setToAddress(bean.getAddress());
+        transaction.setHash(payCheckRequest.getId());
+
+        TokenTransaction result = tokenTransactionMapper.selectOne(transaction);
+        if (null != result && result.getValue() != null) {
+          PayCheckResponse response = new PayCheckResponse();
+          response.setTime(result.getTimeStamp());
+          response.setTokenname(result.getTokenSymbol());
+          response.setWallet(bean.getAddress());
+          response.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
+          return response;
+        } else {
+          throw new BizException(payCheckRequest.getId() + "该充值不存在");
+        }
       }
     } catch (Exception e) {
-      throw new BizException(e.getMessage());
+      e.printStackTrace();
+      throw new BizException("充值校验失败");
     }
   }
 
@@ -202,7 +213,7 @@ public class WalletServiceImpl implements WalletService {
         public void run() {
           try {
             TokenTransaction queryT = new TokenTransaction();
-            queryT.setTo(resultBean.getAddress());
+            queryT.setToAddress(resultBean.getAddress());
             TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
             WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
             String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
@@ -210,7 +221,7 @@ public class WalletServiceImpl implements WalletService {
               List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
               if (transactionList == null || transactionList.size() > 0) { //
                 for (TokenTransaction transaction : transactionList) {
-                  if (transaction.getTo().equals(resultBean.getAddress())) { //如果是转入
+                  if (transaction.getToAddress().equals(resultBean.getAddress())) { //如果是转入
                     if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
                       tokenTransactionMapper.update(transaction);//存储到数据库，
                     } else if (lastToken == null) {

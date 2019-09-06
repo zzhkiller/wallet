@@ -36,8 +36,8 @@ public class TokenTransaction {
   private String timeStamp;
   private String hash;
   private String blockHash;
-  private String from; //
-  private String to;
+  private String fromAddress; //
+  private String toAddress;
   private String value;//转账数量
   private String isError; //0 成功
   private String contractAddress;// 合约地址
@@ -69,20 +69,20 @@ public class TokenTransaction {
     this.hash = hash;
   }
 
-  public String getFrom() {
-    return from;
+  public String getFromAddress() {
+    return fromAddress;
   }
 
-  public void setFrom(String from) {
-    this.from = from;
+  public void setFromAddress(String fromAddress) {
+    this.fromAddress = fromAddress;
   }
 
-  public String getTo() {
-    return to;
+  public String getToAddress() {
+    return toAddress;
   }
 
-  public void setTo(String to) {
-    this.to = to;
+  public void setToAddress(String toAddress) {
+    this.toAddress = toAddress;
   }
 
   public String getValue() {
@@ -157,8 +157,8 @@ public class TokenTransaction {
             ", timeStamp='" + timeStamp + '\'' +
             ", hash='" + hash + '\'' +
             ", blockHash='" + blockHash + '\'' +
-            ", from='" + from + '\'' +
-            ", to='" + to + '\'' +
+            ", from='" + fromAddress + '\'' +
+            ", to='" + toAddress + '\'' +
             ", value='" + value + '\'' +
             ", isError='" + isError + '\'' +
             ", contractAddress='" + contractAddress + '\'' +

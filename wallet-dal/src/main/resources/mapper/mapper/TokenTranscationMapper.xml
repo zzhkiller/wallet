@@ -6,8 +6,8 @@
     <result column="block_number" jdbcType="VARCHAR" property="blockNumber" />
     <result column="time_stamp" jdbcType="VARCHAR" property="timeStamp" />
     <result column="hash" jdbcType="VARCHAR" property="hash" />
-    <result column="from_adr" jdbcType="VARCHAR" property="from" />
-    <result column="to_adr" jdbcType="VARCHAR" property="to" />
+    <result column="from_adr" jdbcType="VARCHAR" property="fromAddress" />
+    <result column="to_adr" jdbcType="VARCHAR" property="toAddress" />
     <result column="change_value" jdbcType="VARCHAR" property="value" />
     <result column="is_error" jdbcType="VARCHAR" property="isError" />
     <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
@@ -56,10 +56,10 @@
       <if test="hash != null">
         #{hash,jdbcType=VARCHAR},
       </if>
-      <if test="from != null">
+      <if test="fromAddress != null">
         #{from_adr,jdbcType=VARCHAR},
       </if>
-      <if test="to != null">
+      <if test="toAddress != null">
         #{to_adr,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
@@ -85,11 +85,11 @@
       <if test="hash != null">
         hash = #{hash,jdbcType=VARCHAR},
       </if>
-      <if test="from != null">
-        from_adr = #{from,jdbcType=VARCHAR},
+      <if test="fromAddress != null">
+        from_adr = #{fromAddress,jdbcType=VARCHAR},
       </if>
-      <if test="to != null">
-        to_adr = #{to,jdbcType=VARCHAR},
+      <if test="toAddress != null">
+        to_adr = #{toAddress,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
         change_value = #{value,jdbcType=VARCHAR},
@@ -126,11 +126,11 @@
     <if test="hash != null">
        and hash = #{hash,jdbcType=VARCHAR}
     </if>
-    <if test="from != null">
-       and from_adr = #{from,jdbcType=VARCHAR}
+    <if test="fromAddress != null">
+       and from_adr = #{fromAddress,jdbcType=VARCHAR}
     </if>
-    <if test="to != null">
-       and to_adr = #{to,jdbcType=VARCHAR}
+    <if test="toAddress != null">
+       and to_adr = #{toAddress,jdbcType=VARCHAR}
     </if>
     <if test="value != null">
        and change_value = #{value,jdbcType=VARCHAR}
@@ -155,11 +155,11 @@
     <if test="hash != null">
        and hash = #{hash,jdbcType=VARCHAR}
     </if>
-    <if test="from != null">
-       and from_adr = #{from,jdbcType=VARCHAR}
+    <if test="fromAddress != null">
+       and from_adr = #{fromAddress,jdbcType=VARCHAR}
     </if>
-    <if test="to != null">
-       and to_adr = #{to,jdbcType=VARCHAR}
+    <if test="toAddress != null">
+       and to_adr = #{toAddress,jdbcType=VARCHAR}
     </if>
     <if test="value != null">
        and change_value = #{value,jdbcType=VARCHAR}
