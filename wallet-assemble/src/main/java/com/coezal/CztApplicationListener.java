@@ -1,5 +1,6 @@
 package com.coezal;
 
+import com.coezal.component.InitComponent;
 import com.coezal.wallet.api.bean.RsaKey;
 import com.coezal.wallet.api.bean.Token;
 import com.coezal.wallet.api.bean.WalletBean;
@@ -13,8 +14,11 @@ import com.coezal.wallet.dal.dao.WalletBeanMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -29,6 +33,7 @@ import java.util.Map;
  */
 
 @Component
+@EnableAsync
 public class CztApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
 
   private static final Logger logger = LoggerFactory.getLogger("CztApplicationListener");
@@ -39,14 +44,15 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
   @Resource
   RsaKeyMapper rsaKeyMapper;
 
-  @Resource
-  WalletBeanMapper walletBeanMapper;
+  @Autowired
+  InitComponent initComponent;
+
 
   @Override
   public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
     initRsaKey();
     initToken();
-    initWallet();
+    initComponent.initWallet();
   }
 
   private void initRsaKey() {
@@ -82,31 +88,6 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
     }
   }
 
-  /**
-   * 初始化钱包
-   */
-  private void initWallet() {
-    WalletBean walletBean = new WalletBean();
-    walletBean.setOwnerInfo("");
-    List<WalletBean> walletBeans = walletBeanMapper.select(walletBean);
-    if (walletBeans == null || walletBeans.size() == 0) {
-      logger.info("init wallet");
-      new Thread(){
-        @Override
-        public void run() {
-          try {
-            for(int i=0; i <1000 ;i++) {
-              WalletBean bean = WalletGenerator.createHDWallet();
-              bean.setOwnerInfo("");
-              walletBeanMapper.insert(bean);
-              logger.info("initWallet"+bean.toString());
-            }
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        }
-      }.start();
-    }
-  }
+
 
 }
