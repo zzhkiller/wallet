@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
 
+import static com.coezal.wallet.api.enums.ResultCode.*;
+
 /**
  * Version 1.0
  * Created by lll on 2019-08-27.
@@ -60,7 +62,7 @@ public class WalletServiceImpl implements WalletService {
     try {
       paramJson = RSACoder.decryptAPIParams(param);
     } catch (Exception e) {
-      throw new BizException("解密参数异常");
+      throw new BizException(DECRYPT_ERROR);
     }
     WalletAddressRequest walletAddressRequest = JsonUtil.decode(paramJson, WalletAddressRequest.class);
     //校验参数
@@ -92,12 +94,12 @@ public class WalletServiceImpl implements WalletService {
             response.setWallet(walletBean.getAddress());
             return response;
           } catch (Exception e) {
-            throw new BizException("生成钱包异常" + e.getMessage());
+            throw new BizException(CREATE_WALLET_ERROR);
           }
         }
       }
     } else {
-      throw new BizException("用户必须是手机号或者邮箱");
+      throw new BizException(PARAM_ERROR);
     }
   }
 
@@ -108,41 +110,38 @@ public class WalletServiceImpl implements WalletService {
    */
   @Override
   public PayCheckResponse payCheck(String dataStr) {
+    String paramJson = null;
     try {
-      String paramJson = RSACoder.decryptAPIParams(dataStr);
+      paramJson = RSACoder.decryptAPIParams(dataStr);
+    } catch (Exception e) {
+      throw new BizException(DECRYPT_ERROR);
+    }
+    try {
       PayCheckRequest payCheckRequest = JsonUtil.decode(paramJson, PayCheckRequest.class);
       //校验参数
       checkPayCheckRequest(payCheckRequest);
       //第一步：校验用户是否存在钱包地址：
       WalletBean bean = getUserWalletBean(payCheckRequest.getUsersign() + "|" + payCheckRequest.getCheckcode());
       logger.info("paycheck===" + payCheckRequest.toString());
-      if (payCheckRequest.getServer().equals("test")) {
+
+      TokenTransaction transaction = new TokenTransaction();
+      transaction.setToAddress(bean.getAddress());
+      transaction.setHash(payCheckRequest.getId());
+
+      TokenTransaction result = tokenTransactionMapper.selectOne(transaction);
+      if (null != result && result.getValue() != null) {
         PayCheckResponse response = new PayCheckResponse();
-        response.setTime(new Date().getTime() + "");
-        response.setTokenname("USDT");
+        response.setTime(result.getTimeStamp());
+        response.setTokenname(result.getTokenSymbol());
         response.setWallet(bean.getAddress());
-        response.setMoney("4000");
+        response.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
         return response;
       } else {
-        TokenTransaction transaction = new TokenTransaction();
-        transaction.setToAddress(bean.getAddress());
-        transaction.setHash(payCheckRequest.getId());
-
-        TokenTransaction result = tokenTransactionMapper.selectOne(transaction);
-        if (null != result && result.getValue() != null) {
-          PayCheckResponse response = new PayCheckResponse();
-          response.setTime(result.getTimeStamp());
-          response.setTokenname(result.getTokenSymbol());
-          response.setWallet(bean.getAddress());
-          response.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
-          return response;
-        } else {
-          throw new BizException(payCheckRequest.getId() + "该充值不存在");
-        }
+        throw new BizException(PAY_CHECK_ERROR);
       }
     } catch (Exception e) {
       e.printStackTrace();
-      throw new BizException("充值校验失败");
+      throw new BizException(PAY_CHECK_ERROR);
     }
   }
 
@@ -174,16 +173,17 @@ public class WalletServiceImpl implements WalletService {
   @Override
   public void paySearch(String dataStr) {
     PaySearchRequest paySearchRequest;
+    String paramJson = null;
     try {
-      String paramJson = RSACoder.decryptAPIParams(dataStr);
-      paySearchRequest = JsonUtil.decode(paramJson, PaySearchRequest.class);
-      logger.info("paySearch===="+ paySearchRequest.toString());
-      System.out.println(paySearchRequest.toString());
-      checkPaySearchRequest(paySearchRequest);//校验参数
+      paramJson = RSACoder.decryptAPIParams(dataStr);
     } catch (Exception e) {
       e.printStackTrace();
-      throw new BizException("解密参数异常");
+      throw new BizException(DECRYPT_ERROR);
     }
+    paySearchRequest = JsonUtil.decode(paramJson, PaySearchRequest.class);
+    logger.info("paySearch====" + paySearchRequest.toString());
+    checkPaySearchRequest(paySearchRequest);//校验参数
+
     //查询token 对应的contract address
     Token token = new Token();
     token.setTokenSymbol(paySearchRequest.getTokenname());
@@ -191,62 +191,51 @@ public class WalletServiceImpl implements WalletService {
     System.out.println(resultToken.toString());
     if (resultToken == null || resultToken.getTokenContractAddress() == null) {
       // 报错，没有找到token数据
-      throw new BizException("没有找到对应的token");
+      throw new BizException(TOKEN_NOT_EXIT);
     }
 
     WalletBean resultBean = getUserWalletBean(paySearchRequest.getUsersign() + "|" + paySearchRequest.getCheckcode());
     logger.info(resultBean.toString());
 
-    if (paySearchRequest.getServer().equals("test")) {
-      RechargeRequest rechargeRequest = new RechargeRequest();
-      rechargeRequest.setUsersign(paySearchRequest.getUsersign());
-      rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
-      rechargeRequest.setId("dafdafdsafds");
-      rechargeRequest.setTokenname("USDT");
-      rechargeRequest.setWallet(resultBean.getAddress());
-      rechargeRequest.setTime(new Date().getTime() + "");
-      rechargeRequest.setMoney("4000");
-      noticeService.rechargeNotice(rechargeRequest);
-    } else {
-      new Thread() { //开启线程池
-        @Override
-        public void run() {
-          try {
-            TokenTransaction queryT = new TokenTransaction();
-            queryT.setToAddress(resultBean.getAddress());
-            TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
-            WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
-            String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
-            if (balance != null && !balance.equals("0")) { //用户余额不为0
-              List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
-              if (transactionList == null || transactionList.size() > 0) { //
-                for (TokenTransaction transaction : transactionList) {
-                  if (transaction.getToAddress().equals(resultBean.getAddress())) { //如果是转入
-                    if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
-                      tokenTransactionMapper.update(transaction);//存储到数据库，
-                    } else if (lastToken == null) {
-                      tokenTransactionMapper.insert(transaction);//插入数据
-                    }
-                    //通知api有充值
-                    RechargeRequest rechargeRequest = new RechargeRequest();
-                    rechargeRequest.setUsersign(paySearchRequest.getUsersign());
-                    rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
-                    rechargeRequest.setId(transaction.getHash());
-                    rechargeRequest.setTokenname(transaction.getTokenSymbol());
-                    rechargeRequest.setWallet(resultBean.getAddress());
-                    rechargeRequest.setTime(transaction.getTimeStamp());
-                    rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
-                    noticeService.rechargeNotice(rechargeRequest);
+    new Thread() { //开启线程池
+      @Override
+      public void run() {
+        try {
+          TokenTransaction queryT = new TokenTransaction();
+          queryT.setToAddress(resultBean.getAddress());
+          TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
+          WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
+          String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
+          if (balance != null && !balance.equals("0")) { //用户余额不为0
+            List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
+            if (transactionList == null || transactionList.size() > 0) { //
+              for (TokenTransaction transaction : transactionList) {
+                if (transaction.getToAddress().equals(resultBean.getAddress())) { //如果是转入
+                  if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
+                    tokenTransactionMapper.update(transaction);//存储到数据库，
+                  } else if (lastToken == null) {
+                    tokenTransactionMapper.insert(transaction);//插入数据
                   }
+                  //通知api有充值
+                  RechargeRequest rechargeRequest = new RechargeRequest();
+                  rechargeRequest.setUsersign(paySearchRequest.getUsersign());
+                  rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
+                  rechargeRequest.setId(transaction.getHash());
+                  rechargeRequest.setTokenname(transaction.getTokenSymbol());
+                  rechargeRequest.setWallet(resultBean.getAddress());
+                  rechargeRequest.setTime(transaction.getTimeStamp());
+                  rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
+                  noticeService.rechargeNotice(rechargeRequest);
                 }
               }
             }
-          } catch (Exception e) {
-            throw new BizException(e.getMessage());
           }
+        } catch (Exception e) {
+          e.printStackTrace();
         }
-      }.start();
-    }
+      }
+    }.start();
+
   }
 
   private WalletBean getUserWalletBean(String usrInfo) {
@@ -254,7 +243,7 @@ public class WalletServiceImpl implements WalletService {
     bean.setOwnerInfo(usrInfo);
     WalletBean resultBean = walletMapper.selectOne(bean);
     if (resultBean == null || resultBean.getAddress() == null) {
-      throw new BizException(usrInfo + "没有钱包地址");
+      throw new BizException(WALLET_NOT_EXIT);
     }
     return resultBean;
   }
@@ -267,7 +256,7 @@ public class WalletServiceImpl implements WalletService {
     sb.append(walletAddressRequest.getTokenname());
     sb.append(salt);
     if(!Objects.equals(walletAddressRequest.getMd5chk(), Md5Util.MD5(sb.toString()))){
-      throw new BizException("加密错误");
+      throw new BizException(MD5_CHECK_ERROR);
     }
   }
 
@@ -279,7 +268,7 @@ public class WalletServiceImpl implements WalletService {
     sb.append(payCheckRequest.getId());
     sb.append(salt);
     if(!Objects.equals(payCheckRequest.getMd5chk(), Md5Util.MD5(sb.toString()))){
-      throw new BizException("加密错误");
+      throw new BizException(MD5_CHECK_ERROR);
     }
   }
 
@@ -290,7 +279,7 @@ public class WalletServiceImpl implements WalletService {
     sb.append(fetchCashRequest.getId());
     sb.append(salt);
     if(!Objects.equals(fetchCashRequest.getMd5chk(), Md5Util.MD5(sb.toString()))){
-      throw new BizException("加密错误");
+      throw new BizException(MD5_CHECK_ERROR);
     }
   }
 
@@ -302,7 +291,7 @@ public class WalletServiceImpl implements WalletService {
     sb.append(paySearchRequest.getTokenname());
     sb.append(salt);
     if(!Objects.equals(paySearchRequest.getMd5chk(), Md5Util.MD5(sb.toString()))){
-      throw new BizException("加密错误");
+      throw new BizException(MD5_CHECK_ERROR);
     }
   }
 

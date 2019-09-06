@@ -11,7 +11,15 @@ public enum ResultCode {
     SUCCESS("成功", 0),
     FAIL("服务端异常", 10002),
     PARAM_ERROR("参数错误", 10003),
-    DATA_ERROR("数据异常", 10004);
+    DATA_ERROR("数据异常", 10004),
+    DECRYPT_ERROR("解密参数异常", 10005),
+    CREATE_WALLET_ERROR("钱包生成异常", 10006),
+    WALLET_NOT_EXIT("该用户没有钱包地址", 10007),
+
+    PAY_CHECK_ERROR("充值不存在", 10008),
+    MD5_CHECK_ERROR("MD5校验异常", 10009),
+
+    TOKEN_NOT_EXIT("token 不存在", 10010);
 
 
 
