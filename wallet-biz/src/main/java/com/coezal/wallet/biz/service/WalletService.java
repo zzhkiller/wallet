@@ -35,7 +35,7 @@ public interface WalletService {
    * @param dataStr
    * @return
    */
-  FetchCashResponse fetchCash(String dataStr);
+  String getRequest(String dataStr);
 
   /**
    * 获取所有用户的钱包地址

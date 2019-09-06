@@ -35,8 +35,8 @@ public interface WalletApi {
 
 
   @ApiOperation(value = "请求提现", notes = "fetchCash", protocols = "https")
-  @RequestMapping(value = "/fetchCash", method = RequestMethod.POST)
-  BaseResponse<FetchCashResponse> fetchCash(@ApiParam(value = "请求", required = true)  String datastr);
+  @RequestMapping(value = "/getrequest", method = RequestMethod.POST)
+  BaseResponse<String> getRequest(@ApiParam(value = "请求", required = true)  String datastr);
 
   @ApiOperation(value = "刷新用户充值记录", notes = "paySearch", protocols = "https")
   @RequestMapping(value = "/paysearch", method = RequestMethod.POST)

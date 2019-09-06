@@ -88,7 +88,7 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
   private void initWallet() {
     List<WalletBean> walletBeans = walletBeanMapper.select(null);
     if (walletBeans == null || walletBeans.size() == 0) {
-      logger.info("init token", "initWallet");
+      logger.info("init wallet");
       new Thread(){
         @Override
         public void run() {
@@ -96,6 +96,7 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
             for(int i=0; i <1000 ;i++) {
               WalletBean bean = WalletGenerator.createHDWallet();
               walletBeanMapper.insert(bean);
+              logger.info("initWallet"+bean.toString());
             }
           } catch (Exception e) {
             e.printStackTrace();

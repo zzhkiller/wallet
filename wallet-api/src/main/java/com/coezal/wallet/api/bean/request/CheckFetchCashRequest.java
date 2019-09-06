@@ -6,37 +6,33 @@ import java.io.Serializable;
  * 查询提现请求是否真实
  */
 public class CheckFetchCashRequest implements Serializable {
-
-    private String wallet;
-
-    private String money;
-
-    private Integer status;
-
+    private String usersign;
+    private String checkcode;
+    private Long id;//体现编号
     private String md5chk;
 
-    public String getWallet() {
-        return wallet;
+    public String getUsersign() {
+        return usersign;
     }
 
-    public void setWallet(String wallet) {
-        this.wallet = wallet;
+    public void setUsersign(String usersign) {
+        this.usersign = usersign;
     }
 
-    public String getMoney() {
-        return money;
+    public String getCheckcode() {
+        return checkcode;
     }
 
-    public void setMoney(String money) {
-        this.money = money;
+    public void setCheckcode(String checkcode) {
+        this.checkcode = checkcode;
     }
 
-    public Integer getStatus() {
-        return status;
+    public Long getId() {
+        return id;
     }
 
-    public void setStatus(Integer status) {
-        this.status = status;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getMd5chk() {

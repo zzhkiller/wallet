@@ -19,7 +19,10 @@ public enum ResultCode {
     PAY_CHECK_ERROR("充值不存在", 10008),
     MD5_CHECK_ERROR("MD5校验异常", 10009),
 
-    TOKEN_NOT_EXIT("token 不存在", 10010);
+    TOKEN_NOT_EXIT("token 不存在", 10010),
+
+    FETCH_CASH_EXIT("提现请求已经存在", 10011),
+    FETCH_CASH_ERROR("提现请求校验不通过", 10012);
 
 
 

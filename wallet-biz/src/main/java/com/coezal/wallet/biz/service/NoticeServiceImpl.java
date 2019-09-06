@@ -48,12 +48,17 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
         return Boolean.TRUE;
     }
 
+    /**
+     * 提现校验
+     * @param checkFetchCashRequest
+     * @return
+     */
     @Override
     public Boolean checkFetchCash(CheckFetchCashRequest checkFetchCashRequest) {
         StringBuilder sb = new StringBuilder();
-        sb.append(checkFetchCashRequest.getWallet());
-        sb.append(checkFetchCashRequest.getMoney());
-        sb.append(checkFetchCashRequest.getStatus());
+        sb.append(checkFetchCashRequest.getUsersign());
+        sb.append(checkFetchCashRequest.getCheckcode());
+        sb.append(checkFetchCashRequest.getId());
         sb.append(salt);
         checkFetchCashRequest.setMd5chk(Md5Util.MD5(sb.toString()));
         String jsonObj = JsonUtil.encode(checkFetchCashRequest);
@@ -73,6 +78,11 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
         return Boolean.TRUE;
     }
 
+    /**
+     * 体现成功的通知
+     * @param fetchCashResultRequest
+     * @return
+     */
     @Override
     public Boolean fetchCashResult(FetchCashResultRequest fetchCashResultRequest) {
         StringBuilder sb = new StringBuilder();

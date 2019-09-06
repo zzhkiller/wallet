@@ -40,8 +40,8 @@ public class WalletController extends AbstractController implements WalletApi {
   }
 
   @Override
-  public BaseResponse<FetchCashResponse> fetchCash(String datastr) {
-    return buildJson(walletService.fetchCash(datastr));
+  public BaseResponse<String> getRequest(String datastr) {
+    return buildJson(walletService.getRequest(datastr));
   }
 
   @Override

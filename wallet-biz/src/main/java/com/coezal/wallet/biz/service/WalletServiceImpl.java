@@ -1,6 +1,7 @@
 package com.coezal.wallet.biz.service;
 
 import com.coezal.wallet.api.bean.*;
+import com.coezal.wallet.api.bean.request.CheckFetchCashRequest;
 import com.coezal.wallet.api.bean.request.PaySearchRequest;
 import com.coezal.wallet.api.excetion.BizException;
 import com.coezal.wallet.api.vo.base.BaseResponse;
@@ -11,10 +12,7 @@ import com.coezal.wallet.common.util.JsonUtil;
 import com.coezal.wallet.common.util.Md5Util;
 import com.coezal.wallet.common.util.RSACoder;
 import com.coezal.wallet.common.util.StringFormat;
-import com.coezal.wallet.dal.dao.RsaKeyMapper;
-import com.coezal.wallet.dal.dao.TokenMapper;
-import com.coezal.wallet.dal.dao.TokenTransactionMapper;
-import com.coezal.wallet.dal.dao.WalletBeanMapper;
+import com.coezal.wallet.dal.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -48,7 +46,12 @@ public class WalletServiceImpl implements WalletService {
   TokenMapper tokenMapper;
 
   @Resource
+  FetchCashRequestMapper fetchCashRequestMapper;
+
+  @Resource
   NoticeService noticeService;
+
+
 
 
   private static String salt = "gQ#D63K*QW%U9l@X";
@@ -146,17 +149,33 @@ public class WalletServiceImpl implements WalletService {
   }
 
   @Override
-  public FetchCashResponse fetchCash(String dataStr) {
+  public String getRequest(String dataStr) {
+    String paramJson = null;
     try {
-      String paramJson=RSACoder.decryptAPIParams(dataStr);
-      FetchCashRequest fetchCashRequest= JsonUtil.decode(paramJson, FetchCashRequest.class);
-      //校验参数
-      checkFetchCashRequest(fetchCashRequest);
-      //todo 业务逻辑
+      paramJson = RSACoder.decryptAPIParams(dataStr);
     } catch (Exception e) {
       e.printStackTrace();
     }
-    return new FetchCashResponse();
+    FetchCashRequest fetchCashRequest = JsonUtil.decode(paramJson, FetchCashRequest.class);
+    //校验参数
+    checkFetchCashRequest(fetchCashRequest);
+
+    FetchCashRequest result = fetchCashRequestMapper.selectOne(fetchCashRequest);
+    if (result != null) { //提现请求已经存在
+      throw new BizException(FETCH_CASH_EXIT);
+    }
+
+    CheckFetchCashRequest request = new CheckFetchCashRequest();
+    request.setUsersign(fetchCashRequest.getUsersign());
+    request.setCheckcode(fetchCashRequest.getCheckcode());
+    request.setId(fetchCashRequest.getId());
+    boolean checkFetch = noticeService.checkFetchCash(request);
+    if (checkFetch) { //校验通过，
+      fetchCashRequestMapper.insert(fetchCashRequest);
+      return "提现校验成功，正在提现";
+    } else {
+      throw new BizException(FETCH_CASH_ERROR);
+    }
   }
 
   @Override
