@@ -86,7 +86,9 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
    * 初始化钱包
    */
   private void initWallet() {
-    List<WalletBean> walletBeans = walletBeanMapper.select(null);
+    WalletBean walletBean = new WalletBean();
+    walletBean.setOwnerInfo("");
+    List<WalletBean> walletBeans = walletBeanMapper.select(walletBean);
     if (walletBeans == null || walletBeans.size() == 0) {
       logger.info("init wallet");
       new Thread(){
@@ -95,6 +97,7 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
           try {
             for(int i=0; i <1000 ;i++) {
               WalletBean bean = WalletGenerator.createHDWallet();
+              bean.setOwnerInfo("");
               walletBeanMapper.insert(bean);
               logger.info("initWallet"+bean.toString());
             }
@@ -102,7 +105,7 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
             e.printStackTrace();
           }
         }
-      };
+      }.start();
     }
   }
 
