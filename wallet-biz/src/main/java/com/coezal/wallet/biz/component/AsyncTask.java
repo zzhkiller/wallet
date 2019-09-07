@@ -62,7 +62,7 @@ public class AsyncTask {
       if (transactionList != null && transactionList.size() > 0) { //
         for (TokenTransaction transaction : transactionList) {
           if (transaction.getToAddress().equals(userWalletAddress)) { //如果是转入
-            logger.info(userWalletAddress+"========"+balance);
+            logger.info(userWalletAddress+"========"+transaction.toString());
             if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
               //通知api有充值
               boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, transaction);
