@@ -64,24 +64,36 @@ public class AsyncTask {
           if (transaction.getToAddress().equals(userWalletAddress)) { //如果是转入
             logger.info(userWalletAddress+"========"+balance);
             if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
-              tokenTransactionMapper.update(transaction);//存储到数据库，
+              //通知api有充值
+              boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, transaction);
+              if (success) {
+                tokenTransactionMapper.update(transaction);//存储到数据库，
+              }
+              break; //每次只通知一次
             } else if (lastToken == null) {
-              tokenTransactionMapper.insert(transaction);//插入数据
+              //通知api有充值
+              boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, transaction);
+              if (success) {
+                tokenTransactionMapper.insert(transaction);//插入数据
+              }
+              break;
             }
-            //通知api有充值
-            RechargeRequest rechargeRequest = new RechargeRequest();
-            rechargeRequest.setUsersign(userSign);
-            rechargeRequest.setCheckcode(checkCode);
-            rechargeRequest.setId(transaction.getHash());
-            rechargeRequest.setTokenname(transaction.getTokenSymbol());
-            rechargeRequest.setWallet(userWalletAddress);
-            rechargeRequest.setTime(transaction.getTimeStamp());
-            rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
-            noticeService.rechargeNotice(rechargeRequest);
           }
         }
       }
     }
+  }
+
+  private boolean sendRechargeNotice(String userSign, String checkCode, String userWalletAddress, TokenTransaction transaction) {
+    RechargeRequest rechargeRequest = new RechargeRequest();
+    rechargeRequest.setUsersign(userSign);
+    rechargeRequest.setCheckcode(checkCode);
+    rechargeRequest.setId(transaction.getHash());
+    rechargeRequest.setTokenname(transaction.getTokenSymbol());
+    rechargeRequest.setWallet(userWalletAddress);
+    rechargeRequest.setTime(transaction.getTimeStamp());
+    rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
+    return noticeService.rechargeNotice(rechargeRequest);
   }
 
 
