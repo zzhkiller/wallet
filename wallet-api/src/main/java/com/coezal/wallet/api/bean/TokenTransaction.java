@@ -173,14 +173,15 @@ public class TokenTransaction {
             ", timeStamp='" + timeStamp + '\'' +
             ", hash='" + hash + '\'' +
             ", blockHash='" + blockHash + '\'' +
-            ", from='" + fromAddress + '\'' +
-            ", to='" + toAddress + '\'' +
+            ", fromAddress='" + fromAddress + '\'' +
+            ", toAddress='" + toAddress + '\'' +
             ", value='" + value + '\'' +
             ", isError='" + isError + '\'' +
             ", contractAddress='" + contractAddress + '\'' +
             ", tokenName='" + tokenName + '\'' +
             ", tokenSymbol='" + tokenSymbol + '\'' +
             ", tokenDecimal='" + tokenDecimal + '\'' +
+            ", notifySuccessFlag=" + notifySuccessFlag +
             '}';
   }
 }

@@ -65,6 +65,7 @@ public class AsyncTask {
         tokenTransactionMapper.update(lastToken);
         return;
       }
+      logger.info("lastToken====success=="+success+"===="+lastToken.toString());
     }
 
     //2、查询服务器，获取充值数据
@@ -76,8 +77,8 @@ public class AsyncTask {
       if (transactionList != null && transactionList.size() > 0) { //
         for (TokenTransaction transaction : transactionList) {
           if (transaction.getToAddress().equals(userWalletAddress)) { //如果是转入
-            logger.info(userWalletAddress+"========"+transaction.toString());
             if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
+              transaction.setId(lastToken.getId());
               transaction.setNotifySuccessFlag((byte)0);
               tokenTransactionMapper.update(transaction);
               //通知api有充值
@@ -87,6 +88,7 @@ public class AsyncTask {
                 transaction.setNotifySuccessFlag((byte)1);
                 tokenTransactionMapper.update(transaction);
               }
+              logger.info("update wallets====success=="+success+"===="+transaction.toString());
               break; //每次只通知一次
             } else if (lastToken == null) {
               transaction.setNotifySuccessFlag((byte)0);
@@ -97,6 +99,7 @@ public class AsyncTask {
                 transaction.setNotifySuccessFlag((byte)1);
                 tokenTransactionMapper.update(transaction);//插入数据
               }
+              logger.info("insert wallets====success=="+success+"===="+transaction.toString());
               break;
             }
           }
