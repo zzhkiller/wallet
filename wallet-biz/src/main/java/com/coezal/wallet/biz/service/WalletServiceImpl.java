@@ -4,9 +4,8 @@ import com.coezal.wallet.api.bean.*;
 import com.coezal.wallet.api.bean.request.CheckFetchCashRequest;
 import com.coezal.wallet.api.bean.request.PaySearchRequest;
 import com.coezal.wallet.api.excetion.BizException;
-import com.coezal.wallet.api.vo.base.BaseResponse;
+import com.coezal.wallet.biz.component.AsyncTask;
 import com.coezal.wallet.biz.util.WalletUtils;
-import com.coezal.wallet.biz.wallet.PasswordGenerator;
 import com.coezal.wallet.biz.wallet.WalletGenerator;
 import com.coezal.wallet.common.util.JsonUtil;
 import com.coezal.wallet.common.util.Md5Util;
@@ -15,14 +14,13 @@ import com.coezal.wallet.common.util.StringFormat;
 import com.coezal.wallet.dal.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
-import java.util.Timer;
 
 import static com.coezal.wallet.api.enums.ResultCode.*;
 
@@ -46,11 +44,10 @@ public class WalletServiceImpl implements WalletService {
   TokenMapper tokenMapper;
 
   @Resource
-  FetchCashRequestMapper fetchCashRequestMapper;
+  FetchCashMapper fetchCashMapper;
 
-  @Resource
-  NoticeService noticeService;
-
+  @Autowired
+  AsyncTask asyncTask;
 
 
 
@@ -81,7 +78,7 @@ public class WalletServiceImpl implements WalletService {
         response.setWallet(hadWalletBean.getAddress());
         return response;
       } else { //查询联系人地址为空的钱包
-        queryWalletBean.setOwnerInfo(null);
+        queryWalletBean.setOwnerInfo("");
         List<WalletBean> walletBeanList = walletMapper.select(queryWalletBean);
         if (walletBeanList != null && walletBeanList.size() > 0) {
           WalletBean walletBean = walletBeanList.get(0);
@@ -148,6 +145,11 @@ public class WalletServiceImpl implements WalletService {
     }
   }
 
+  /**
+   * 体现请求
+   * @param dataStr
+   * @return
+   */
   @Override
   public String getRequest(String dataStr) {
     String paramJson = null;
@@ -157,30 +159,43 @@ public class WalletServiceImpl implements WalletService {
       e.printStackTrace();
     }
     FetchCashRequest fetchCashRequest = JsonUtil.decode(paramJson, FetchCashRequest.class);
-    //校验参数
+    //1、校验参数
     checkFetchCashRequest(fetchCashRequest);
 
-    FetchCashRequest result = fetchCashRequestMapper.selectOne(fetchCashRequest);
+    //2、校验token是否存在
+    getToken(fetchCashRequest.getTokenname());
+    //3、校验用户钱包是否存在
+    getUserWalletBean(fetchCashRequest.getUsersign()+"|"+ fetchCashRequest.getCheckcode());
+
+    //4、校验相同提现请求是否已经存在
+    FetchCash cash = new FetchCash();
+    cash.setCode(fetchCashRequest.getId());
+    cash.setMd5chk(fetchCashRequest.getMd5chk());
+    cash.setUserSign(fetchCashRequest.getUsersign());
+    cash.setCheckCode(fetchCashRequest.getCheckcode());
+    cash.setMoney(fetchCashRequest.getMoney());
+    cash.setTokenName(fetchCashRequest.getTokenname());
+    cash.setServer(fetchCashRequest.getServer());
+    cash.setTime(new Date(fetchCashRequest.getTime()));
+    FetchCash result = fetchCashMapper.selectOne(cash);
     if (result != null) { //提现请求已经存在
       throw new BizException(FETCH_CASH_EXIT);
     }
 
-    CheckFetchCashRequest request = new CheckFetchCashRequest();
-    request.setUsersign(fetchCashRequest.getUsersign());
-    request.setCheckcode(fetchCashRequest.getCheckcode());
-    request.setId(fetchCashRequest.getId());
-    boolean checkFetch = noticeService.checkFetchCash(request);
-    if (checkFetch) { //校验通过，
-      fetchCashRequestMapper.insert(fetchCashRequest);
-      return "提现校验成功，正在提现";
-    } else {
-      throw new BizException(FETCH_CASH_ERROR);
-    }
+    asyncTask.doFetchCashRequest(fetchCashRequest.getUsersign(),fetchCashRequest.getCheckcode(),fetchCashRequest.getId(),cash);
+    return "";
   }
 
+  /**
+   * 返回所有关联过用户的钱包地址
+   * @return
+   */
   @Override
   public List<WalletBean> getAllUserAddresses() {
-
+    //@todo 返回所有关联过用户的钱包地址
+    WalletBean bean = new WalletBean();
+    bean.getOwnerInfo();
+    walletMapper.select(bean);
     return null;
   }
 
@@ -204,57 +219,15 @@ public class WalletServiceImpl implements WalletService {
     checkPaySearchRequest(paySearchRequest);//校验参数
 
     //查询token 对应的contract address
-    Token token = new Token();
-    token.setTokenSymbol(paySearchRequest.getTokenname());
-    Token resultToken = tokenMapper.selectOne(token);
-    System.out.println(resultToken.toString());
+    Token resultToken = getToken(paySearchRequest.getTokenname());
+    logger.info("token info===="+resultToken.toString());
     if (resultToken == null || resultToken.getTokenContractAddress() == null) {
-      // 报错，没有找到token数据
-      throw new BizException(TOKEN_NOT_EXIT);
+      throw new BizException(TOKEN_NOT_EXIT);// 报错，没有找到token数据
     }
 
     WalletBean resultBean = getUserWalletBean(paySearchRequest.getUsersign() + "|" + paySearchRequest.getCheckcode());
-    logger.info(resultBean.toString());
-
-    new Thread() { //开启线程池
-      @Override
-      public void run() {
-        try {
-          TokenTransaction queryT = new TokenTransaction();
-          queryT.setToAddress(resultBean.getAddress());
-          TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
-          WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
-          String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
-          if (balance != null && !balance.equals("0")) { //用户余额不为0
-            List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(paySearchRequest.getServer(), resultBean.getAddress(), resultToken.getTokenContractAddress());
-            if (transactionList == null || transactionList.size() > 0) { //
-              for (TokenTransaction transaction : transactionList) {
-                if (transaction.getToAddress().equals(resultBean.getAddress())) { //如果是转入
-                  if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
-                    tokenTransactionMapper.update(transaction);//存储到数据库，
-                  } else if (lastToken == null) {
-                    tokenTransactionMapper.insert(transaction);//插入数据
-                  }
-                  //通知api有充值
-                  RechargeRequest rechargeRequest = new RechargeRequest();
-                  rechargeRequest.setUsersign(paySearchRequest.getUsersign());
-                  rechargeRequest.setCheckcode(paySearchRequest.getCheckcode());
-                  rechargeRequest.setId(transaction.getHash());
-                  rechargeRequest.setTokenname(transaction.getTokenSymbol());
-                  rechargeRequest.setWallet(resultBean.getAddress());
-                  rechargeRequest.setTime(transaction.getTimeStamp());
-                  rechargeRequest.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
-                  noticeService.rechargeNotice(rechargeRequest);
-                }
-              }
-            }
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    }.start();
-
+    logger.info("wallet bean==="+resultBean.toString());
+    asyncTask.checkUserRecharge(resultBean.getAddress(), resultToken.getTokenContractAddress(), paySearchRequest.getServer(), paySearchRequest.getUsersign(), paySearchRequest.getCheckcode());
   }
 
   private WalletBean getUserWalletBean(String usrInfo) {
@@ -266,6 +239,17 @@ public class WalletServiceImpl implements WalletService {
     }
     return resultBean;
   }
+
+  private Token getToken(String tokenSymbol){
+    Token token = new Token();
+    token.setTokenSymbol(tokenSymbol);
+    Token resultToken = tokenMapper.selectOne(token);
+    if(resultToken == null){
+      throw new BizException(TOKEN_NOT_EXIT);
+    }
+    return resultToken;
+  }
+
 
   private void checkWalletAddressRequestParams(WalletAddressRequest walletAddressRequest) {
     StringBuilder sb=new StringBuilder();

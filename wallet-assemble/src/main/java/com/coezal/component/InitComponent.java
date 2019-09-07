@@ -36,6 +36,7 @@ public class InitComponent {
     WalletBean walletBean = new WalletBean();
     walletBean.setOwnerInfo("");
     List<WalletBean> walletBeans = walletBeanMapper.select(walletBean);
+    logger.info("init wallet 用户为空的钱包数量===="+walletBeans.size());
     if (walletBeans == null || walletBeans.size() == 0) {
       logger.info("init wallet");
       try {

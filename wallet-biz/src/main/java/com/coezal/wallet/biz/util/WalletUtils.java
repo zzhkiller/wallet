@@ -35,17 +35,13 @@ public class WalletUtils {
   private static final Logger logger = LoggerFactory.getLogger("WalletTransaction");
 
   /**
-   * 初始钱包数据
-   *
+   * usdt 钱包聚集地址
    */
-  private void initWallet() {
-    for (int i = 0; i < 1000; i++) {
+  public static final String WALLET_COLLECT_USDT_ADDRESS = "x7ylLfy3hKBYEWnZdr9GQJbyzHDTTmshMa+mQXtQe5gJtqOgz7OkqSb1zX+Ctjo7";
 
-    }
-  }
 
   /**
-   *
+   * 获取实际转账数量
    * @param money
    * @param tokenDecimal
    * @return

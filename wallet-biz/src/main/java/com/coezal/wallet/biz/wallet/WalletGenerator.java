@@ -109,7 +109,7 @@ public class WalletGenerator {
   }
 
 
-  private static String getPwd(){
+  public static String getPwd(){
     try {
       String src = new String(RSACoder.decryptByPrivateKey(Base64.decodeBase64(GENERAL_KEY),Base64.decodeBase64(PRIVATE_KEY_STR)));
       return src;
@@ -117,5 +117,15 @@ public class WalletGenerator {
       e.printStackTrace();
       return "wallet.coezal.com.io";
     }
+  }
+
+  public static void main(String[] args){
+    String aesPwd = getPwd();
+    String encryptMnemonic = AESUtils.encrypt("0x66f666Ab0aee01D7eE9C55745dd2Fb35772E6E1F", aesPwd);
+    System.out.println("aesPwd===" + aesPwd);
+    System.out.println("encryptMnemonic===" + encryptMnemonic);
+
+    String decrypt = AESUtils.decrypt(encryptMnemonic, aesPwd);
+    System.out.println("decrypt===" + decrypt);
   }
 }

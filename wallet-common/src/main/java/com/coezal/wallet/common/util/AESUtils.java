@@ -89,16 +89,16 @@ public class AESUtils {
     return null;
   }
 
-//  public static void main(String[] args){
-//    System.out.println("原始字符串为:  abdndfj");
-//    String  encryStr = encrypt("abdndfj", "123abc");
-//    System.out.println("加密后字符串为:  "+encryStr);
-//
-//    String  decryptStr = decrypt(encryStr, "123abc");
-//
-//    System.out.println("解密后字符串为:  " + decryptStr);
-//
-//  }
+  public static void main(String[] args){
+    System.out.println("原始字符串为:  abdndfj");
+    String  encryStr = encrypt("abdndfj", "123abc");
+    System.out.println("加密后字符串为:  "+encryStr);
+
+    String  decryptStr = decrypt(encryStr, "123abc");
+
+    System.out.println("解密后字符串为:  " + decryptStr);
+
+  }
 }
 
 
