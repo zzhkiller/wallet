@@ -40,7 +40,7 @@ public class InitComponent {
     if (walletBeans == null || walletBeans.size() == 0) {
       logger.info("init wallet");
       try {
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 2000; i++) {
           WalletBean bean = WalletGenerator.createHDWallet();
           bean.setOwnerInfo("");
           walletBeanMapper.insert(bean);
