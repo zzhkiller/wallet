@@ -195,7 +195,7 @@ public class WalletServiceImpl implements WalletService {
     //@todo 返回所有关联过用户的钱包地址
     WalletBean bean = new WalletBean();
     bean.getOwnerInfo();
-    walletMapper.select(bean);
+    walletMapper.selectAllUsedAddress();
     return null;
   }
 
