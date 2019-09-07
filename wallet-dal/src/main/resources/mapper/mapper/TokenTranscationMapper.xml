@@ -57,13 +57,13 @@
         #{hash,jdbcType=VARCHAR},
       </if>
       <if test="fromAddress != null">
-        #{from_adr,jdbcType=VARCHAR},
+        #{fromAddress,jdbcType=VARCHAR},
       </if>
       <if test="toAddress != null">
-        #{to_adr,jdbcType=VARCHAR},
+        #{toAddress,jdbcType=VARCHAR},
       </if>
       <if test="value != null">
-        #{change_value,jdbcType=VARCHAR},
+        #{value,jdbcType=VARCHAR},
       </if>
       <if test="isError != null">
         #{isError,jdbcType=VARCHAR},
