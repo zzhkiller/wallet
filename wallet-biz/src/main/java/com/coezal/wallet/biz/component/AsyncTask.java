@@ -51,9 +51,23 @@ public class AsyncTask {
    */
   @Async
   public void checkUserRecharge(String userWalletAddress, String tokenContractAddress, String server, String userSign, String checkCode) {
+
+    //1、数据库存在未通知成功的数据
     TokenTransaction queryT = new TokenTransaction();
     queryT.setToAddress(userWalletAddress);
+    queryT.setContractAddress(tokenContractAddress);
     TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
+    if(lastToken != null && !lastToken.getNotifyApiSuccess()){
+      boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, lastToken);
+      if (success) {
+        //存储到数据库，
+        lastToken.setNotifyApiSuccess(true);
+        tokenTransactionMapper.update(lastToken);
+        return;
+      }
+    }
+
+    //2、查询服务器，获取充值数据
     WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
     String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(server, userWalletAddress, tokenContractAddress);
     logger.info(userWalletAddress+"========"+balance);
@@ -64,17 +78,24 @@ public class AsyncTask {
           if (transaction.getToAddress().equals(userWalletAddress)) { //如果是转入
             logger.info(userWalletAddress+"========"+transaction.toString());
             if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
+              transaction.setNotifyApiSuccess(false);
+              tokenTransactionMapper.update(transaction);
               //通知api有充值
               boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, transaction);
               if (success) {
-                tokenTransactionMapper.update(transaction);//存储到数据库，
+                //通知成功，更新数据库
+                transaction.setNotifyApiSuccess(true);
+                tokenTransactionMapper.update(transaction);
               }
               break; //每次只通知一次
             } else if (lastToken == null) {
+              transaction.setNotifyApiSuccess(false);
+              tokenTransactionMapper.insert(transaction);
               //通知api有充值
               boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, transaction);
-              if (success) {
-                tokenTransactionMapper.insert(transaction);//插入数据
+              if (success) {//通知成功，更新
+                transaction.setNotifyApiSuccess(true);
+                tokenTransactionMapper.update(transaction);//插入数据
               }
               break;
             }
