@@ -14,7 +14,7 @@
     <result column="token_name" jdbcType="VARCHAR" property="tokenName" />
     <result column="token_symbol" jdbcType="VARCHAR" property="tokenSymbol" />
     <result column="token_decimal" jdbcType="VARCHAR" property="tokenDecimal" />
-    <result column="notify_success_flag" jdbcType="TINYINT" property="notifyApiSuccessFlag" />
+    <result column="notify_success_flag" jdbcType="TINYINT" property="notifySuccessFlag" />
 
   </resultMap>
   <sql id="Base_Column_List">
