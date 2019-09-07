@@ -94,6 +94,7 @@
         sign_key = #{signKey,jdbcType=VARCHAR},
       </if>
     </set>
+      where id = #{id,jdbcType=BIGINT}
   </update>
   <select id="select" parameterType="com.coezal.wallet.api.bean.WalletBean" resultMap="BaseResultMap">
     select 
