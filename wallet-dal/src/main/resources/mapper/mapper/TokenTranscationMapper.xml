@@ -11,9 +11,12 @@
     <result column="change_value" jdbcType="VARCHAR" property="value" />
     <result column="is_error" jdbcType="VARCHAR" property="isError" />
     <result column="contract_address" jdbcType="VARCHAR" property="contractAddress" />
+    <result column="token_name" jdbcType="VARCHAR" property="tokenName" />
+    <result column="token_symbol" jdbcType="VARCHAR" property="tokenSymbol" />
+    <result column="token_decimal" jdbcType="VARCHAR" property="tokenDecimal" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, block_number, time_stamp, hash, from_adr, to_adr, change_value, is_error, contract_address
+    id, block_number, time_stamp, hash, from_adr, to_adr, change_value, is_error, contract_address,token_name,token_symbol,token_decimal
   </sql>
   <insert id="insert" parameterType="com.coezal.wallet.api.bean.TokenTransaction">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -45,6 +48,15 @@
       <if test="contractAddress != null">
         contract_address,
       </if>
+      <if test="tokenName != null">
+        token_name,
+      </if>
+      <if test="tokenSymbol != null">
+        token_symbol,
+      </if>
+      <if test="tokenDecimal != null">
+        token_decimal,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="blockNumber != null">
@@ -70,6 +82,15 @@
       </if>
       <if test="contractAddress != null">
         #{contractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenName != null">
+        #{tokenName,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenSymbol != null">
+        #{tokenSymbol,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenDecimal != null">
+        #{tokenDecimal,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -99,6 +120,15 @@
       </if>
       <if test="contractAddress != null">
         contract_address = #{contractAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenName != null">
+        token_name= #{tokenName,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenSymbol != null">
+        token_symbol= #{tokenSymbol,jdbcType=VARCHAR},
+      </if>
+      <if test="tokenDecimal != null">
+        token_decimal= #{tokenDecimal,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -141,6 +171,15 @@
     <if test="contractAddress != null">
        and contract_address = #{contractAddress,jdbcType=VARCHAR}
     </if>
+    <if test="tokenName != null">
+      and token_name= #{tokenName,jdbcType=VARCHAR},
+    </if>
+    <if test="tokenSymbol != null">
+      and token_symbol= #{tokenSymbol,jdbcType=VARCHAR},
+    </if>
+    <if test="tokenDecimal != null">
+      and token_decimal= #{tokenDecimal,jdbcType=VARCHAR},
+    </if>
   </select>
   <select id="selectOne" parameterType="com.coezal.wallet.api.bean.TokenTransaction" resultMap="BaseResultMap">
     select 
@@ -169,6 +208,15 @@
     </if>
     <if test="contractAddress != null">
        and contract_address = #{contractAddress,jdbcType=VARCHAR}
+    </if>
+    <if test="tokenName != null">
+      and token_name= #{tokenName,jdbcType=VARCHAR},
+    </if>
+    <if test="tokenSymbol != null">
+      and token_symbol= #{tokenSymbol,jdbcType=VARCHAR},
+    </if>
+    <if test="tokenDecimal != null">
+      and token_decimal= #{tokenDecimal,jdbcType=VARCHAR},
     </if>
      limit 1 
   </select>
