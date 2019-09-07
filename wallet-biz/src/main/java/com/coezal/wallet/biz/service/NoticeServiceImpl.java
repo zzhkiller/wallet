@@ -75,7 +75,7 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
             e.printStackTrace();
             return Boolean.FALSE;
         }
-        return Boolean.TRUE;
+        return Boolean.FALSE;
     }
 
     /**
@@ -109,6 +109,6 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
             e.printStackTrace();
             return Boolean.FALSE;
         }
-        return Boolean.TRUE;
+        return Boolean.FALSE;
     }
 }
