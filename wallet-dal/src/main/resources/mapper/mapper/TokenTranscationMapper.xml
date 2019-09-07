@@ -30,10 +30,10 @@
       <if test="hash != null">
         hash,
       </if>
-      <if test="from_adr != null">
+      <if test="fromAddress != null">
         from_adr,
       </if>
-      <if test="to_adr != null">
+      <if test="toAddress != null">
         to_adr,
       </if>
       <if test="value != null">
