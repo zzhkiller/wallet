@@ -1,5 +1,6 @@
 package com.coezal.wallet.biz.service;
 
+import com.alibaba.fastjson.TypeReference;
 import com.coezal.wallet.api.bean.TokenTransaction;
 import com.coezal.wallet.api.vo.base.ETHScanBaseResponse;
 import com.coezal.wallet.biz.util.ThirdApiInvoker;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
-import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
@@ -74,7 +74,8 @@ public class WalletTransactionListenerServiceImpl extends ThirdApiInvoker implem
       sb.append("&address=").append(address);
       sb.append("&page=1&offset=100&sort=asc&apikey=").append(API_KEY);
 
-      ETHScanBaseResponse<List<TokenTransaction>> baseResponse = getETHScanBaseResponse(sb.toString(),null,ETHScanBaseResponse.class, null);
+      ETHScanBaseResponse<List<TokenTransaction>> baseResponse = getETHScanBaseResponse(sb.toString(), null, new TypeReference<ETHScanBaseResponse<List<TokenTransaction>>>() {
+      }, null);
       return baseResponse.getResult();
     } catch (Exception e) {
       e.printStackTrace();
