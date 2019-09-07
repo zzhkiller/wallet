@@ -47,7 +47,7 @@ public class TokenTransaction {
   private String tokenName;
   private String tokenSymbol;
   private String tokenDecimal;
-  private Boolean isNotifyApiSuccess;
+  private boolean isNotifyApiSuccess;
 
   public String getBlockNumber() {
     return blockNumber;
@@ -157,11 +157,11 @@ public class TokenTransaction {
     this.tokenSymbol = tokenSymbol;
   }
 
-  public Boolean getNotifyApiSuccess() {
+  public boolean isNotifyApiSuccess() {
     return isNotifyApiSuccess;
   }
 
-  public void setNotifyApiSuccess(Boolean notifyApiSuccess) {
+  public void setNotifyApiSuccess(boolean notifyApiSuccess) {
     isNotifyApiSuccess = notifyApiSuccess;
   }
 

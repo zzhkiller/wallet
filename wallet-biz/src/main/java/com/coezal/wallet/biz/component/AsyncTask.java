@@ -57,7 +57,7 @@ public class AsyncTask {
     queryT.setToAddress(userWalletAddress);
     queryT.setContractAddress(tokenContractAddress);
     TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
-    if(lastToken != null && !lastToken.getNotifyApiSuccess()){
+    if(lastToken != null && !lastToken.isNotifyApiSuccess()){
       boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, lastToken);
       if (success) {
         //存储到数据库，
