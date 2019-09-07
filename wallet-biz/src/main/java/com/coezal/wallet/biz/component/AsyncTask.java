@@ -62,6 +62,7 @@ public class AsyncTask {
       if (transactionList != null && transactionList.size() > 0) { //
         for (TokenTransaction transaction : transactionList) {
           if (transaction.getToAddress().equals(userWalletAddress)) { //如果是转入
+            logger.info(userWalletAddress+"========"+balance);
             if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
               tokenTransactionMapper.update(transaction);//存储到数据库，
             } else if (lastToken == null) {

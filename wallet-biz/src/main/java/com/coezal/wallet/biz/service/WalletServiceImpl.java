@@ -134,6 +134,7 @@ public class WalletServiceImpl implements WalletService {
         response.setTime(result.getTimeStamp());
         response.setTokenname(result.getTokenSymbol());
         response.setWallet(bean.getAddress());
+        logger.info("result TokenTransaction===="+result.toString());
         response.setMoney(WalletUtils.getMoney(transaction.getValue(), transaction.getTokenDecimal()));
         return response;
       } else {
