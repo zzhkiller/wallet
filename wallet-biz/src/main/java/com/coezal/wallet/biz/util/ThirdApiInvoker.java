@@ -1,6 +1,7 @@
 package com.coezal.wallet.biz.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.coezal.wallet.api.bean.TokenTransaction;
 import com.coezal.wallet.api.excetion.BizException;
 import com.coezal.wallet.api.vo.base.ETHScanBaseResponse;
@@ -157,7 +158,30 @@ public class ThirdApiInvoker {
     }
 
 
-    protected final ETHScanBaseResponse<List<TokenTransaction>> getETHScanBaseResponse(String url, HttpEntity<String> requestEntity, Class clazz, Map<String, Object> params) {
+//    protected final ETHScanBaseResponse<List<TokenTransaction>> getETHScanBaseResponse(String url, HttpEntity<String> requestEntity, Class clazz, Map<String, Object> params) {
+//        try {
+//            ResponseEntity<String> responseEntity;
+//            HttpMethod method=HttpMethod.GET;
+//            if (params == null) {
+//                responseEntity = restTemplate.exchange(url, method, requestEntity, String.class);
+//            } else {
+//                responseEntity = restTemplate.exchange(url, method, requestEntity, String.class, params);
+//            }
+//            System.out.println("----response : {}"+responseEntity.getBody());
+//            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+////                ETHScanBaseResponse<List<TokenTransaction>> t = (ETHScanBaseResponse<List<TokenTransaction>>) JSONObject.parseObject(responseEntity.getBody(), clazz);
+//                ETHScanBaseResponse<List<TokenTransaction>> t = (ETHScanBaseResponse<List<TokenTransaction>>) JSONObject.parseObject(responseEntity.getBody(), clazz);
+//                return t;
+//            } else {
+//                return null;
+//            }
+//        } catch (Exception e) {
+//            System.out.println(e.getMessage());
+//            throw new BizException(e.getMessage());
+//        }
+//    }
+
+    protected final ETHScanBaseResponse<List<TokenTransaction>> getETHScanBaseResponse(String url, HttpEntity<String> requestEntity, TypeReference<ETHScanBaseResponse<List<TokenTransaction>>> typeReference , Map<String, Object> params) {
         try {
             ResponseEntity<String> responseEntity;
             HttpMethod method=HttpMethod.GET;
@@ -168,7 +192,8 @@ public class ThirdApiInvoker {
             }
             System.out.println("----response : {}"+responseEntity.getBody());
             if (responseEntity.getStatusCode() == HttpStatus.OK) {
-                ETHScanBaseResponse<List<TokenTransaction>> t = (ETHScanBaseResponse<List<TokenTransaction>>) JSONObject.parseObject(responseEntity.getBody(), clazz);
+//                ETHScanBaseResponse<List<TokenTransaction>> t = (ETHScanBaseResponse<List<TokenTransaction>>) JSONObject.parseObject(responseEntity.getBody(), clazz);
+                ETHScanBaseResponse<List<TokenTransaction>> t = (ETHScanBaseResponse<List<TokenTransaction>>) JSONObject.parseObject(responseEntity.getBody(), typeReference);
                 return t;
             } else {
                 return null;
@@ -178,6 +203,7 @@ public class ThirdApiInvoker {
             throw new BizException(e.getMessage());
         }
     }
+
 
     protected final <T> T doHttpRequest(String url, HttpMethod method, HttpEntity requestEntity, Class<T> clazz, Map<String, Object> params) {
         try {

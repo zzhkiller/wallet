@@ -1,5 +1,8 @@
 package com.coezal.wallet.api.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 /**
  * Version 1.0
  * Created by lll on 2019-09-02.
@@ -69,18 +72,22 @@ public class TokenTransaction {
     this.hash = hash;
   }
 
+  @JSONField(name = "from")
   public String getFromAddress() {
     return fromAddress;
   }
 
+  @JSONField(name = "from")
   public void setFromAddress(String fromAddress) {
     this.fromAddress = fromAddress;
   }
 
+  @JSONField(name = "to")
   public String getToAddress() {
     return toAddress;
   }
 
+  @JSONField(name = "to")
   public void setToAddress(String toAddress) {
     this.toAddress = toAddress;
   }
