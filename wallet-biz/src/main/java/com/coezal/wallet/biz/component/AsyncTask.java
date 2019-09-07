@@ -10,6 +10,8 @@ import com.coezal.wallet.biz.service.WalletTransactionListenerServiceImpl;
 import com.coezal.wallet.biz.util.WalletUtils;
 import com.coezal.wallet.dal.dao.FetchCashMapper;
 import com.coezal.wallet.dal.dao.TokenTransactionMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,8 @@ import static com.coezal.wallet.api.enums.ResultCode.FETCH_CASH_ERROR;
 
 @Component
 public class AsyncTask {
+
+  private static final Logger logger  = LoggerFactory.getLogger("AsyncTask");
 
   @Resource
   NoticeService noticeService;
@@ -52,9 +56,10 @@ public class AsyncTask {
     TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
     WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
     String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress(server, userWalletAddress, tokenContractAddress);
+    logger.info(userWalletAddress+"========"+balance);
     if (balance != null && !balance.equals("0")) { //用户余额不为0
       List<TokenTransaction> transactionList = impl.getTransactionByAddressAndTokenContractAddress(server, userWalletAddress, tokenContractAddress);
-      if (transactionList == null || transactionList.size() > 0) { //
+      if (transactionList != null && transactionList.size() > 0) { //
         for (TokenTransaction transaction : transactionList) {
           if (transaction.getToAddress().equals(userWalletAddress)) { //如果是转入
             if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
