@@ -14,9 +14,11 @@
     <result column="token_name" jdbcType="VARCHAR" property="tokenName" />
     <result column="token_symbol" jdbcType="VARCHAR" property="tokenSymbol" />
     <result column="token_decimal" jdbcType="VARCHAR" property="tokenDecimal" />
+    <result column="notify_success_flag" jdbcType="TINYINT" property="notifyApiSuccessFlag" />
+
   </resultMap>
   <sql id="Base_Column_List">
-    id, block_number, time_stamp, hash, from_adr, to_adr, change_value, is_error, contract_address,token_name,token_symbol,token_decimal
+    id, block_number, time_stamp, hash, from_adr, to_adr, change_value, is_error, contract_address,token_name,token_symbol,token_decimal,notify_success_flag
   </sql>
   <insert id="insert" parameterType="com.coezal.wallet.api.bean.TokenTransaction">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -57,6 +59,9 @@
       <if test="tokenDecimal != null">
         token_decimal,
       </if>
+      <if test="notifySuccessFlag != null">
+        notify_success_flag,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="blockNumber != null">
@@ -90,7 +95,10 @@
         #{tokenSymbol,jdbcType=VARCHAR},
       </if>
       <if test="tokenDecimal != null">
-        #{tokenDecimal,jdbcType=VARCHAR},
+      #{tokenDecimal,jdbcType=VARCHAR},
+    </if>
+      <if test="notifySuccessFlag != null">
+        #{notifySuccessFlag,jdbcType=TINYINT},
       </if>
     </trim>
   </insert>
@@ -129,6 +137,9 @@
       </if>
       <if test="tokenDecimal != null">
         token_decimal= #{tokenDecimal,jdbcType=VARCHAR},
+      </if>
+      <if test="notifySuccessFlag != null">
+        notify_success_flag = #{notifySuccessFlag,jdbcType=TINYINT},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -177,8 +188,8 @@
     <if test="tokenSymbol != null">
       and token_symbol= #{tokenSymbol,jdbcType=VARCHAR},
     </if>
-    <if test="tokenDecimal != null">
-      and token_decimal= #{tokenDecimal,jdbcType=VARCHAR},
+    <if test="notifySuccessFlag != null">
+      and notify_success_flag = #{notifySuccessFlag,jdbcType=TINYINT}
     </if>
   </select>
   <select id="selectOne" parameterType="com.coezal.wallet.api.bean.TokenTransaction" resultMap="BaseResultMap">
@@ -217,6 +228,9 @@
     </if>
     <if test="tokenDecimal != null">
       and token_decimal= #{tokenDecimal,jdbcType=VARCHAR},
+    </if>
+    <if test="notifySuccessFlag != null">
+      and notify_success_flag = #{notifySuccessFlag,jdbcType=TINYINT}
     </if>
      limit 1 
   </select>
