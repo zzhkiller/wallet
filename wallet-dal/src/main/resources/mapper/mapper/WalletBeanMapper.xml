@@ -155,4 +155,9 @@
     </if>
      limit 1 
   </select>
+    <select id="selectAllUsedAddress" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from wallet where owner_info is not null
+    </select>
 </mapper>

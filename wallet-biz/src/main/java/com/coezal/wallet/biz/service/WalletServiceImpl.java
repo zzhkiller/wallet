@@ -192,11 +192,7 @@ public class WalletServiceImpl implements WalletService {
    */
   @Override
   public List<WalletBean> getAllUserAddresses() {
-    //@todo 返回所有关联过用户的钱包地址
-    WalletBean bean = new WalletBean();
-    bean.getOwnerInfo();
-    walletMapper.select(bean);
-    return null;
+    return walletMapper.selectAllUsedAddress();
   }
 
   /**

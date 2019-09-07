@@ -35,4 +35,10 @@ public interface WalletBeanMapper {
      * 通过条件查询唯一数据信息
      */
     WalletBean selectOne(WalletBean record);
+
+    /**
+     * 获取所有绑定了用户的钱包地址
+     * @return
+     */
+    List<WalletBean> selectAllUsedAddress();
 }
