@@ -57,11 +57,11 @@ public class AsyncTask {
     queryT.setToAddress(userWalletAddress);
     queryT.setContractAddress(tokenContractAddress);
     TokenTransaction lastToken = tokenTransactionMapper.selectOne(queryT);
-    if (lastToken != null && lastToken.getNotifyApiSuccessFlag() == 0) {
+    if (lastToken != null && lastToken.getNotifyApiSuccessFlag() != null && lastToken.getNotifyApiSuccessFlag() == 0) {
       boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, lastToken);
       if (success) {
         //存储到数据库，
-        lastToken.setNotifyApiSuccessFlag(1);
+        lastToken.setNotifyApiSuccessFlag((byte)1);
         tokenTransactionMapper.update(lastToken);
         return;
       }
@@ -78,23 +78,23 @@ public class AsyncTask {
           if (transaction.getToAddress().equals(userWalletAddress)) { //如果是转入
             logger.info(userWalletAddress+"========"+transaction.toString());
             if (lastToken != null && Long.parseLong(transaction.getTimeStamp()) > Long.parseLong(lastToken.getTimeStamp())) {
-              transaction.setNotifyApiSuccessFlag(0);
+              transaction.setNotifyApiSuccessFlag((byte)0);
               tokenTransactionMapper.update(transaction);
               //通知api有充值
               boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, transaction);
               if (success) {
                 //通知成功，更新数据库
-                transaction.setNotifyApiSuccessFlag(1);
+                transaction.setNotifyApiSuccessFlag((byte)1);
                 tokenTransactionMapper.update(transaction);
               }
               break; //每次只通知一次
             } else if (lastToken == null) {
-              transaction.setNotifyApiSuccessFlag(0);
+              transaction.setNotifyApiSuccessFlag((byte)0);
               tokenTransactionMapper.insert(transaction);
               //通知api有充值
               boolean success = sendRechargeNotice(userSign, checkCode, userWalletAddress, transaction);
               if (success) {//通知成功，更新
-                transaction.setNotifyApiSuccessFlag(1);
+                transaction.setNotifyApiSuccessFlag((byte)1);
                 tokenTransactionMapper.update(transaction);//插入数据
               }
               break;
