@@ -25,12 +25,12 @@ public interface TokenMapper {
   /**
    * 通过主键删除数据
    */
-  int deleteById();
+  int deleteById(Long id);
 
   /**
    * 通过主键获取数据
    */
-  Token selectById();
+  Token selectById(Long id);
 
   /**
    * 通过条件查询数据信息

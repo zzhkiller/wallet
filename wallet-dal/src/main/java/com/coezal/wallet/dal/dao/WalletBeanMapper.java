@@ -16,15 +16,11 @@ public interface WalletBeanMapper {
      */
     int update(WalletBean record);
 
-    /**
-     * 通过主键删除数据
-     */
-    int deleteById();
 
     /**
      * 通过主键获取数据
      */
-    WalletBean selectById();
+    WalletBean selectById(Long id);
 
     /**
      * 通过条件查询数据信息

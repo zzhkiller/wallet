@@ -127,6 +127,7 @@ public class WalletServiceImpl implements WalletService {
       TokenTransaction transaction = new TokenTransaction();
       transaction.setToAddress(bean.getAddress());
       transaction.setHash(payCheckRequest.getId());
+      transaction.setNotifySuccessFlag((byte)0);//没有通知成功的
 
       TokenTransaction result = tokenTransactionMapper.selectOne(transaction);
       if (null != result && result.getValue() != null) {

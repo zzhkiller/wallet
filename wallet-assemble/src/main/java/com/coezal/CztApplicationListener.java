@@ -3,6 +3,7 @@ package com.coezal;
 import com.coezal.component.InitComponent;
 import com.coezal.wallet.api.bean.RsaKey;
 import com.coezal.wallet.api.bean.Token;
+import com.coezal.wallet.api.bean.TokenTransaction;
 import com.coezal.wallet.api.bean.WalletBean;
 import com.coezal.wallet.biz.wallet.PasswordGenerator;
 import com.coezal.wallet.biz.wallet.WalletGenerator;
@@ -10,6 +11,7 @@ import com.coezal.wallet.common.util.AESUtils;
 import com.coezal.wallet.common.util.RSACoder;
 import com.coezal.wallet.dal.dao.RsaKeyMapper;
 import com.coezal.wallet.dal.dao.TokenMapper;
+import com.coezal.wallet.dal.dao.TokenTransactionMapper;
 import com.coezal.wallet.dal.dao.WalletBeanMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
@@ -46,6 +48,9 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
 
   @Autowired
   InitComponent initComponent;
+
+  @Resource
+  TokenTransactionMapper tokenTransactionMapper;
 
 
   @Override
@@ -87,7 +92,4 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
       logger.info("init token", "has token" + tokenList.size());
     }
   }
-
-
-
 }
