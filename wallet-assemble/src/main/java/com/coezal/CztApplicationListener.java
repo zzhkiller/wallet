@@ -49,10 +49,6 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
   @Autowired
   InitComponent initComponent;
 
-  @Resource
-  TokenTransactionMapper tokenTransactionMapper;
-
-
   @Override
   public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
     initRsaKey();
