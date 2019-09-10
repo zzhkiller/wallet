@@ -79,7 +79,7 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
     }
 
     /**
-     * 体现成功的通知
+     * 提现成功的通知
      * @param fetchCashResultRequest
      * @return
      */

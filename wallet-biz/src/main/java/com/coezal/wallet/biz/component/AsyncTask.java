@@ -104,7 +104,6 @@ public class AsyncTask {
     boolean checkFetch = noticeService.checkFetchCash(request);
     if (checkFetch) { //校验通过，
       mapper.insert(cash);
-
     } else {
       throw new BizException(FETCH_CASH_ERROR);
     }

@@ -147,7 +147,7 @@ public class WalletServiceImpl implements WalletService {
   }
 
   /**
-   * 体现请求
+   * 提现请求
    * @param dataStr
    * @return
    */
