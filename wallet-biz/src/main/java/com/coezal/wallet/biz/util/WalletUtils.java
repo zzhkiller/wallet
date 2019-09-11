@@ -16,6 +16,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.tx.Contract;
+import org.web3j.utils.Convert;
 import org.web3j.utils.Numeric;
 
 import java.io.IOException;
@@ -49,5 +50,16 @@ public class WalletUtils {
   public static String getMoney(String money, String tokenDecimal) {
     BigDecimal bigDecimal = new BigDecimal(money);
     return bigDecimal.divide(BigDecimal.TEN.pow(Integer.parseInt(tokenDecimal))) + "";
+  }
+
+  /**
+   * number 转成 token单位对应的BigInteger
+   * @param money
+   * @param tokenDecimal
+   * @return
+   */
+  public static BigInteger getFetchMoney(String money, int tokenDecimal) {
+    BigDecimal bigDecimal = new BigDecimal(money);
+    return bigDecimal.multiply(BigDecimal.TEN.pow(tokenDecimal)).toBigInteger();
   }
 }

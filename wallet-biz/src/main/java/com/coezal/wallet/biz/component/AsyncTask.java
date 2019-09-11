@@ -1,20 +1,22 @@
 package com.coezal.wallet.biz.component;
 
-import com.coezal.wallet.api.bean.FetchCash;
-import com.coezal.wallet.api.bean.RechargeRequest;
-import com.coezal.wallet.api.bean.TokenTransaction;
+import com.coezal.wallet.api.bean.*;
 import com.coezal.wallet.api.bean.request.CheckFetchCashRequest;
 import com.coezal.wallet.api.excetion.BizException;
 import com.coezal.wallet.biz.service.NoticeService;
 import com.coezal.wallet.biz.service.WalletTransactionListenerServiceImpl;
 import com.coezal.wallet.biz.util.WalletUtils;
+import com.coezal.wallet.biz.wallet.WalletTransaction;
 import com.coezal.wallet.dal.dao.FetchCashMapper;
 import com.coezal.wallet.dal.dao.TokenTransactionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -41,6 +43,9 @@ public class AsyncTask {
 
   @Resource
   FetchCashMapper mapper;
+
+  @Value("${eth.rpc.url}")
+  String web3jUrl;
 
   /**
    * 异步检查用户充值记录
@@ -96,35 +101,26 @@ public class AsyncTask {
    * @param cash
    */
   @Async
-  public void doFetchCashRequest(String userSign, String checkCode, long id, FetchCash cash) {
+  public void doFetchCashRequest(String userSign, String checkCode, long id, FetchCash cash, Token token) {
     CheckFetchCashRequest request = new CheckFetchCashRequest();
     request.setUsersign(userSign);
     request.setCheckcode(checkCode);
     request.setId(id);
     boolean checkFetch = noticeService.checkFetchCash(request);
     if (checkFetch) { //校验通过，
-      mapper.insert(cash);
+      mapper.insert(cash);//转账
+      try {
+//        WalletTransaction transaction = new WalletTransaction(web3jUrl);
+//        EthSendTransaction transactionHash = transaction.transferERC20Token("", cash.getWallet(), WalletUtils.getFetchMoney(cash.getMoney() + "", token.getTokenDecimals()), "", token.getTokenContractAddress());
+//        cash.setTransactionHash(transactionHash.getTransactionHash());
+//        mapper.update(cash);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
     } else {
       throw new BizException(FETCH_CASH_ERROR);
     }
-  }
-
-  private void deleteToken(){
-    TokenTransaction transaction = new TokenTransaction();
-    transaction.setNotifySuccessFlag((byte)1);
-    List<TokenTransaction> transactions = tokenTransactionMapper.select(transaction);
-    for(TokenTransaction tt: transactions){
-      tokenTransactionMapper.deleteById(tt.getId());
-    }
-  }
-
-  /**
-   *
-   * @param args
-   */
-  public static void main(String[] args){
-    AsyncTask task = new AsyncTask();
-    task.deleteToken();
   }
 
 }

@@ -24,6 +24,9 @@ import javax.annotation.Resource;
 @Component
 public class ScheduledTask {
 
+  private static String ETH_PRIVATE_KEY="90045577276D3F91E79FA47962B47613AF273063F02DB6AB9FB3DDD2A160EE69";
+
+
   @Resource
   FetchCashMapper fetchCashMapper;
 
@@ -35,6 +38,14 @@ public class ScheduledTask {
   public void createWalletByFixRate(){
 
   }
+
+
+
+
+
+
+
+
 
 
 

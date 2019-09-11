@@ -3,7 +3,9 @@ package com.coezal.wallet.api.bean;
 import java.util.Date;
 
 /**
- * fetch_cash数据库映射实体
+ * 请求体现的doman
+ *
+ *
  */
 public class FetchCash {
     private Long id;
@@ -24,7 +26,11 @@ public class FetchCash {
 
     private Date time;
 
-    private String md5chk;
+    private String md5chk; //
+
+    private String transactionHash; //转账hash
+
+    private byte transactionSuccess; //转账是否成功：0不成功，1成功
 
     public Long getId() {
         return id;
@@ -104,5 +110,21 @@ public class FetchCash {
 
     public void setMd5chk(String md5chk) {
         this.md5chk = md5chk;
+    }
+
+    public String getTransactionHash() {
+        return transactionHash;
+    }
+
+    public void setTransactionHash(String transactionHash) {
+        this.transactionHash = transactionHash;
+    }
+
+    public byte getTransactionSuccess() {
+        return transactionSuccess;
+    }
+
+    public void setTransactionSuccess(byte transactionSuccess) {
+        this.transactionSuccess = transactionSuccess;
     }
 }

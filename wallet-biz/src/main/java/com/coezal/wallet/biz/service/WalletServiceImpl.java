@@ -164,7 +164,7 @@ public class WalletServiceImpl implements WalletService {
     checkFetchCashRequest(fetchCashRequest);
 
     //2、校验token是否存在
-    getToken(fetchCashRequest.getTokenname());
+    Token token = getToken(fetchCashRequest.getTokenname());
     //3、校验用户钱包是否存在
     getUserWalletBean(fetchCashRequest.getUsersign()+"|"+ fetchCashRequest.getCheckcode());
 
@@ -183,7 +183,7 @@ public class WalletServiceImpl implements WalletService {
       throw new BizException(FETCH_CASH_EXIT);
     }
 
-    asyncTask.doFetchCashRequest(fetchCashRequest.getUsersign(),fetchCashRequest.getCheckcode(),fetchCashRequest.getId(),cash);
+    asyncTask.doFetchCashRequest(fetchCashRequest.getUsersign(), fetchCashRequest.getCheckcode(), fetchCashRequest.getId(), cash, token);
     return "";
   }
 
