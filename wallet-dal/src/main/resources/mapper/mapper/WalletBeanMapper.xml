@@ -158,6 +158,6 @@
     <select id="selectAllUsedAddress" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List" />
-        from wallet where owner_info is not null
+        from wallet where owner_info is not null or owner_info != ""
     </select>
 </mapper>
