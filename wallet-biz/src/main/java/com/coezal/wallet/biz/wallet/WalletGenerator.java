@@ -121,7 +121,7 @@ public class WalletGenerator {
 
   public static void main(String[] args){
     String aesPwd = getPwd();
-    String encryptMnemonic = AESUtils.encrypt("0x66f666Ab0aee01D7eE9C55745dd2Fb35772E6E1F", aesPwd);
+    String encryptMnemonic = AESUtils.encrypt("0x67712b56876586AAAB3C92cdF8cA7a43f6eCFBD1", aesPwd);
     System.out.println("aesPwd===" + aesPwd);
     System.out.println("encryptMnemonic===" + encryptMnemonic);
 
