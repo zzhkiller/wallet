@@ -7,10 +7,7 @@ import com.coezal.wallet.api.excetion.BizException;
 import com.coezal.wallet.biz.component.AsyncTask;
 import com.coezal.wallet.biz.util.WalletUtils;
 import com.coezal.wallet.biz.wallet.WalletGenerator;
-import com.coezal.wallet.common.util.JsonUtil;
-import com.coezal.wallet.common.util.Md5Util;
-import com.coezal.wallet.common.util.RSACoder;
-import com.coezal.wallet.common.util.StringFormat;
+import com.coezal.wallet.common.util.*;
 import com.coezal.wallet.dal.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -193,8 +191,15 @@ public class WalletServiceImpl implements WalletService {
    */
   @Override
   public List<WalletBean> getAllUserAddresses() {
+
+    List<WalletBean> beanList = walletMapper.selectAllUsedAddress();
+
+    asyncTask.getAllBalanceNotNullAddress(beanList, "0xdac17f958d2ee523a2206206994597c13d831ec7");
+
     return walletMapper.selectAllUsedAddress();
   }
+
+
 
   /**
    * 查询充值结果

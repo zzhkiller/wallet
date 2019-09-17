@@ -1,7 +1,9 @@
 package com.coezal.wallet.biz.wallet;
 
 import com.coezal.wallet.api.bean.WalletBean;
+import com.coezal.wallet.biz.service.WalletTransactionListenerServiceImpl;
 import com.coezal.wallet.biz.util.BalanceUtils;
+import com.coezal.wallet.biz.util.WalletUtils;
 import com.coezal.wallet.common.util.AESUtils;
 import com.coezal.wallet.dal.dao.WalletBeanMapper;
 import org.slf4j.Logger;
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -81,8 +84,8 @@ public class WalletTransaction {
    */
   public String signETHTransaction(String fromAddress, String toAddress, String privateKey, String amount) throws Exception {
 
-      //查询地址交易编号
-    BigInteger nonce = web3j.ethGetTransactionCount(fromAddress, DefaultBlockParameterName.PENDING).send().getTransactionCount();
+    //查询地址交易编号
+    BigInteger nonce = getNonce(fromAddress);
     //支付的矿工费
     BigInteger gasPrice = getGasPrice();
     BigInteger gasLimit = getGasLimit();
@@ -96,15 +99,10 @@ public class WalletTransaction {
     byte[] signMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
 
     //广播交易
-    EthSendTransaction ethSendTransaction =  web3j.ethSendRawTransaction(Numeric.toHexString(signMessage)).sendAsync().get();//.getTransactionHash();
+    EthSendTransaction transactionReceipt =  web3j.ethSendRawTransaction(Numeric.toHexString(signMessage)).sendAsync().get();//.getTransactionHash();
 
-//    BigDecimal decimal = Convert.toWei(amount, Convert.Unit.ETHER);
-//    TransactionReceipt transactionReceipt = Transfer.sendFunds(
-//            web3j, credentials, toAddress,
-//            decimal, Convert.Unit.ETHER).sendAsync().get();
-
-    logger.info("eth transaction === " + toAddress + "======amount=====" + amount + "=======error===" + ethSendTransaction.getError() + "====hash=" + ethSendTransaction.getTransactionHash());
-    return ethSendTransaction.getTransactionHash();
+    logger.info("eth transaction address=== " + toAddress + "======amount=====" + amount + "=======error=== ====hash=" + transactionReceipt.getTransactionHash());
+    return transactionReceipt.getTransactionHash();
   }
 
   /**
@@ -153,11 +151,16 @@ public class WalletTransaction {
    * @throws IOException
    */
   private BigInteger getGasPrice() throws Exception {
-    final int gasPriceMinGwei = BalanceUtils.getGasPriceMinGwei();
-    return BalanceUtils.gweiToWei(BigDecimal.valueOf(20 + gasPriceMinGwei));
-//    return web3j.ethGasPrice().sendAsync().get().getGasPrice();
+//    final int gasPriceMinGwei = BalanceUtils.getGasPriceMinGwei();
+//    return BalanceUtils.gweiToWei(BigDecimal.valueOf(20 + gasPriceMinGwei));
+    return web3j.ethGasPrice().sendAsync().get().getGasPrice();
   }
 
+  /**
+   * 获取eth 交易中的 gas limit 默认为21000L
+   * @return
+   * @throws Exception
+   */
   private BigInteger getGasLimit() throws  Exception{
     return BigInteger.valueOf(BalanceUtils.GAS_LIMIT_MIN);
   }
@@ -174,6 +177,19 @@ public class WalletTransaction {
     BigInteger nonce = transactionCount.getTransactionCount();
     logger.info("transaction nonce====:", nonce);
     return nonce;
+  }
+
+  /**
+   * 获取eth余额
+   * @param address
+   * @return
+   * @throws Exception
+   */
+  private double getEthBalance(String address) throws Exception{
+    BigInteger balance = web3j.ethGetBalance(address,DefaultBlockParameterName.LATEST).send().getBalance();
+    double num = Convert.fromWei(balance.toString(), Convert.Unit.ETHER).doubleValue();
+    System.out.println(" get ETH num ====="+num);
+    return num;
   }
 
 
@@ -225,36 +241,38 @@ public class WalletTransaction {
 
 
   /**
-   * 测试eth 转账
+   * eth 转账
    * @throws Exception
    */
-  private void testTransEth() throws Exception {
+  public void transEth(String toAddress, String amount) throws Exception {
     String pwd = WalletGenerator.getPwd();
     String formAddress =AESUtils.decrypt(ETH_ADDRESS, pwd);
-    String toAddress = "0xf102121cbaaa2731F2c68C11157c8c56d970C3df";
-//    String toAddress = "0xd9795Ac75229d4bE73cF817D0d65eC03E378849B";
-//    String toAddress = "0x604f2DB361304e9C775d76182B00C3C2dC397Dcc";
-//    String toAddress = "0xf102121cbaaa2731F2c68C11157c8c56d970C3df";
-//    String toAddress = "0x16be8F8fe00587AFa9e95744745C7124D6806535";
-//    String toAddress = "0x140c7553f5b8e3d1de34c1075f2a87b6aebff916";
-    System.out.println("transaction eth formAddress ===" + formAddress);
+    logger.info("transaction eth formAddress ===" + formAddress);
     String privateKey = AESUtils.decrypt(ETH_PRIVATE_KEY, pwd);
-    System.out.println("transaction eth privateKey ===" + privateKey);
+    logger.info("transaction eth privateKey ===" + privateKey);
     String hash = signETHTransaction(formAddress, toAddress, privateKey, "0.005");
-    System.out.println("transaction eth hash ===" + hash);
+    logger.info("transaction eth hash ===" + hash);
   }
 
   /**
-   * 测试转账 usdt
+   * 聚集usdt
    * @throws Exception
    */
-  private void testTransUsdt() throws Exception{
-
-
+  public void collectUsdt(String fromAddress, String amount) throws Exception{
 
 //    String hash = signETHTransaction(formAddress, toAddress, privateKey, "");
 //    System.out.println("transaction hash ===" + hash);
   }
+
+  /**
+   *
+   * @throws Exception
+   */
+  public void transUsdt(String toAddres, String amount) throws Exception{
+
+  }
+
+
 
 
 
@@ -266,10 +284,11 @@ public class WalletTransaction {
     WalletTransaction transaction = new WalletTransaction("https://mainnet.infura.io/v3/e7f92614009d4a28b55bb9576b59a828");
 //    WalletTransaction transaction = new WalletTransaction("https://ropsten.infura.io/v3/e7f92614009d4a28b55bb9576b59a828");
     try {
-      transaction.testTransEth();
+      transaction.getEthBalance("0xf102121cbaaa2731F2c68C11157c8c56d970C3df");
+//      transaction.transEth();
       long value = transaction.getGasPrice().longValue();
-      System.out.println("gas value===" + value);
-      System.out.println("gas limit===" + Contract.GAS_LIMIT.longValue());
+//      System.out.println("gas value===" + value);
+//      System.out.println("gas limit===" + (BigInteger.valueOf(BalanceUtils.GAS_LIMIT_MIN)).longValue());
     } catch (Exception e) {
       e.printStackTrace();
     }

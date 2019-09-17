@@ -6,7 +6,9 @@ import com.coezal.wallet.api.excetion.BizException;
 import com.coezal.wallet.biz.service.NoticeService;
 import com.coezal.wallet.biz.service.WalletTransactionListenerServiceImpl;
 import com.coezal.wallet.biz.util.WalletUtils;
+import com.coezal.wallet.biz.wallet.WalletGenerator;
 import com.coezal.wallet.biz.wallet.WalletTransaction;
+import com.coezal.wallet.common.util.AESUtils;
 import com.coezal.wallet.dal.dao.FetchCashMapper;
 import com.coezal.wallet.dal.dao.TokenTransactionMapper;
 import org.slf4j.Logger;
@@ -120,6 +122,23 @@ public class AsyncTask {
 
     } else {
       throw new BizException(FETCH_CASH_ERROR);
+    }
+  }
+
+  /**
+   * 获取有用户关联的钱包地址余额
+   * @param beanList
+   */
+  @Async
+  public void getAllBalanceNotNullAddress(List<WalletBean> beanList, String contractAddress){
+    WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
+    String pwd = WalletGenerator.getPwd();
+    for (WalletBean bean : beanList) {
+      String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress("official", bean.getAddress(), contractAddress);
+      if (balance != null && !balance.equals("0")) {
+        String privateKey = AESUtils.decrypt(bean.getPrivateKey(), pwd);
+        logger.info("the address== " + bean.getAddress() + " privatekey=====" + privateKey + " balance==" + balance);
+      }
     }
   }
 
