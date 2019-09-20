@@ -274,8 +274,6 @@ public class WalletTransaction {
 
 
 
-
-
   /**
    *
    * @param args

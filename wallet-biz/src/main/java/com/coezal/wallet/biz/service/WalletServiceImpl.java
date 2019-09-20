@@ -196,7 +196,7 @@ public class WalletServiceImpl implements WalletService {
 
     asyncTask.getAllBalanceNotNullAddress(beanList, "0xdac17f958d2ee523a2206206994597c13d831ec7");
 
-    return walletMapper.selectAllUsedAddress();
+    return beanList;
   }
 
 

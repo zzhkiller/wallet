@@ -119,13 +119,13 @@ public class WalletGenerator {
     }
   }
 
-  public static void main(String[] args){
-    String aesPwd = getPwd();
-    String encryptMnemonic = AESUtils.encrypt("0x67712b56876586AAAB3C92cdF8cA7a43f6eCFBD1", aesPwd);
-    System.out.println("aesPwd===" + aesPwd);
-    System.out.println("encryptMnemonic===" + encryptMnemonic);
-
-    String decrypt = AESUtils.decrypt(encryptMnemonic, aesPwd);
-    System.out.println("decrypt===" + decrypt);
-  }
+//  public static void main(String[] args){
+//    String aesPwd = getPwd();
+//    String encryptMnemonic = AESUtils.encrypt("0x67712b56876586AAAB3C92cdF8cA7a43f6eCFBD1", aesPwd);
+//    System.out.println("aesPwd===" + aesPwd);
+//    System.out.println("encryptMnemonic===" + encryptMnemonic);
+//
+//    String decrypt = AESUtils.decrypt(encryptMnemonic, aesPwd);
+//    System.out.println("decrypt===" + decrypt);
+//  }
 }
