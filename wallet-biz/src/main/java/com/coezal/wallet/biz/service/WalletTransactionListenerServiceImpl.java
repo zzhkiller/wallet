@@ -116,14 +116,14 @@ public class WalletTransactionListenerServiceImpl extends ThirdApiInvoker implem
     }
   }
 
-  public static void main(String[] args) {
-    WalletTransactionListenerServiceImpl im = new WalletTransactionListenerServiceImpl();
+//  public static void main(String[] args) {
+//    WalletTransactionListenerServiceImpl im = new WalletTransactionListenerServiceImpl();
     //
-        im.getTransactionByAddressAndTokenContractAddress("official","0x16be8F8fe00587AFa9e95744745C7124D6806535", "0x99a3721266997cd8CB48aFE11b3D43B4eb70d281");
+//        im.getTransactionByAddressAndTokenContractAddress("official","0x16be8F8fe00587AFa9e95744745C7124D6806535", "0x99a3721266997cd8CB48aFE11b3D43B4eb70d281");
 //    String money = im.getWalletBalanceOfByAddressAndTokenContractAddress("official","0x16be8F8fe00587AFa9e95744745C7124D6806535", "0x99a3721266997cd8CB48aFE11b3D43B4eb70d281");
 //    String dM = WalletUtils.getMoney(money, 18+"");
 //    System.out.println("format balance==="+dM);
-  }
+//  }
 
 
 }
