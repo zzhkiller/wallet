@@ -24,6 +24,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 import static com.coezal.wallet.api.enums.ResultCode.FETCH_CASH_ERROR;
+import static com.coezal.wallet.biz.wallet.PasswordGenerator.getPwd;
 
 /**
  * Version 1.0
@@ -112,14 +113,19 @@ public class AsyncTask {
     if (checkFetch) { //校验通过，
       mapper.insert(cash);//转账
       try {
-//        WalletTransaction transaction = new WalletTransaction(web3jUrl);
-//        EthSendTransaction transactionHash = transaction.transferERC20Token("", cash.getWallet(), WalletUtils.getFetchMoney(cash.getMoney() + "", token.getTokenDecimals()), "", token.getTokenContractAddress());
-//        cash.setTransactionHash(transactionHash.getTransactionHash());
-//        mapper.update(cash);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+        WalletTransaction transaction = new WalletTransaction(web3jUrl);
+        String transactionHash = transaction.doFetchCashTransaction(cash.getWallet(), WalletUtils.getFetchMoney(cash.getMoney() + "", token.getTokenDecimals()), token.getTokenContractAddress());
+        if (transactionHash != null) {
+          cash.setTransactionHash(transactionHash);
+          mapper.update(cash);
+          logger.info("fetch usdt  cash detail====" + cash.toString());
+        } else { //转账失败
 
+        }
+
+      } catch (Exception e) {
+        logger.info("fetch usdt  cash error===" + userSign + "===address" + cash.getWallet(), e);
+      }
     } else {
       throw new BizException(FETCH_CASH_ERROR);
     }
@@ -132,7 +138,7 @@ public class AsyncTask {
   @Async
   public void getAllBalanceNotNullAddress(List<WalletBean> beanList, String contractAddress){
     WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
-    String pwd = WalletGenerator.getPwd();
+    String pwd = getPwd();
     for (WalletBean bean : beanList) {
       String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress("official", bean.getAddress(), contractAddress);
       if (balance != null && !balance.equals("0")) {

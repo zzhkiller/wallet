@@ -4,25 +4,10 @@ import com.alibaba.fastjson.TypeReference;
 import com.coezal.wallet.api.bean.TokenTransaction;
 import com.coezal.wallet.api.vo.base.ETHScanBaseResponse;
 import com.coezal.wallet.biz.util.ThirdApiInvoker;
-import com.coezal.wallet.biz.util.WalletUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.web3j.abi.FunctionEncoder;
-import org.web3j.abi.FunctionReturnDecoder;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.Function;
-import org.web3j.abi.datatypes.Type;
-import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.request.Transaction;
-import org.web3j.protocol.core.methods.response.EthCall;
-import org.web3j.protocol.http.HttpService;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -115,6 +100,8 @@ public class WalletTransactionListenerServiceImpl extends ThirdApiInvoker implem
       return null;
     }
   }
+
+
 
   public static void main(String[] args) {
     WalletTransactionListenerServiceImpl im = new WalletTransactionListenerServiceImpl();

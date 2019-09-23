@@ -10,25 +10,35 @@ import java.util.Date;
 public class FetchCash {
     private Long id;
 
+    /**api 体现请求的id 唯一 不为空*/
     private Long code;
 
+    /**测试还是正式环境区别*/
     private String server;
 
+    /**用户电话，不为空*/
     private String userSign;
 
+    /**用户标记，不为空*/
     private String checkCode;
 
+    /**提币名称，不为空*/
     private String tokenName;
 
+    /**提现钱包地址*/
     private String wallet;
 
+    /**提现数量，不为空*/
     private Float money;
 
+    /**提现时间*/
     private Date time;
 
-    private String md5chk; //
+    /**md5校验，不为空*/
+    private String md5chk;
 
-    private String transactionHash; //转账hash
+    /**提现hash，可为空，但是唯一*/
+    private String transactionHash;
 
     private byte transactionSuccess; //转账是否成功：0不成功，1成功
 
@@ -126,5 +136,23 @@ public class FetchCash {
 
     public void setTransactionSuccess(byte transactionSuccess) {
         this.transactionSuccess = transactionSuccess;
+    }
+
+    @Override
+    public String toString() {
+        return "FetchCash{" +
+                "id=" + id +
+                ", code=" + code +
+                ", server='" + server + '\'' +
+                ", userSign='" + userSign + '\'' +
+                ", checkCode='" + checkCode + '\'' +
+                ", tokenName='" + tokenName + '\'' +
+                ", wallet='" + wallet + '\'' +
+                ", money=" + money +
+                ", time=" + time +
+                ", md5chk='" + md5chk + '\'' +
+                ", transactionHash='" + transactionHash + '\'' +
+                ", transactionSuccess=" + transactionSuccess +
+                '}';
     }
 }
