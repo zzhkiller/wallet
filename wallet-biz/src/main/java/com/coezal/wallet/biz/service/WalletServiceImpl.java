@@ -194,8 +194,7 @@ public class WalletServiceImpl implements WalletService {
 
     List<WalletBean> beanList = walletMapper.selectAllUsedAddress();
 
-    asyncTask.getAllBalanceNotNullAddress(beanList, "0xdac17f958d2ee523a2206206994597c13d831ec7");
-
+    asyncTask.collectUsdtTokenToAddress(beanList);
     return beanList;
   }
 
@@ -230,6 +229,18 @@ public class WalletServiceImpl implements WalletService {
     WalletBean resultBean = getUserWalletBean(paySearchRequest.getUsersign() + "|" + paySearchRequest.getCheckcode());
     logger.info("wallet bean==="+resultBean.toString());
     asyncTask.checkUserRecharge(resultBean.getAddress(), resultToken.getTokenContractAddress(), paySearchRequest.getServer(), paySearchRequest.getUsersign(), paySearchRequest.getCheckcode());
+  }
+
+  /**
+   * 获取所有提现
+   * @return
+   */
+  @Override
+  public List<FetchCash> getAllFetchCashRequest() {
+    FetchCash cash = new FetchCash();
+    cash.setTransactionSuccess((byte)0);
+    List<FetchCash> cashList = fetchCashMapper.select(cash);
+    return cashList;
   }
 
   private WalletBean getUserWalletBean(String usrInfo) {

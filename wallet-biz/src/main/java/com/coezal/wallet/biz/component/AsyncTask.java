@@ -6,6 +6,7 @@ import com.coezal.wallet.api.excetion.BizException;
 import com.coezal.wallet.biz.service.NoticeService;
 import com.coezal.wallet.biz.service.WalletTransactionListenerServiceImpl;
 import com.coezal.wallet.biz.util.WalletUtils;
+import com.coezal.wallet.biz.wallet.PasswordGenerator;
 import com.coezal.wallet.biz.wallet.WalletGenerator;
 import com.coezal.wallet.biz.wallet.WalletTransaction;
 import com.coezal.wallet.common.util.AESUtils;
@@ -21,10 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 
 import javax.annotation.Resource;
+import java.math.BigInteger;
 import java.util.List;
 
 import static com.coezal.wallet.api.enums.ResultCode.FETCH_CASH_ERROR;
+import static com.coezal.wallet.biz.util.WalletConstant.USDT_CONTRACT_ADDRESS;
 import static com.coezal.wallet.biz.wallet.PasswordGenerator.getPwd;
+import static com.coezal.wallet.biz.wallet.WalletTransaction.ETH_DISPATCH_ADDRESS;
 
 /**
  * Version 1.0
@@ -112,20 +116,6 @@ public class AsyncTask {
     boolean checkFetch = noticeService.checkFetchCash(request);
     if (checkFetch) { //校验通过，
       mapper.insert(cash);//转账
-      try {
-        WalletTransaction transaction = new WalletTransaction(web3jUrl);
-        String transactionHash = transaction.doFetchCashTransaction(cash.getWallet(), WalletUtils.getFetchMoney(cash.getMoney() + "", token.getTokenDecimals()), token.getTokenContractAddress());
-        if (transactionHash != null) {
-          cash.setTransactionHash(transactionHash);
-          mapper.update(cash);
-          logger.info("fetch usdt  cash detail====" + cash.toString());
-        } else { //转账失败
-
-        }
-
-      } catch (Exception e) {
-        logger.info("fetch usdt  cash error===" + userSign + "===address" + cash.getWallet(), e);
-      }
     } else {
       throw new BizException(FETCH_CASH_ERROR);
     }
@@ -144,6 +134,36 @@ public class AsyncTask {
       if (balance != null && !balance.equals("0")) {
         String privateKey = AESUtils.decrypt(bean.getPrivateKey(), pwd);
         logger.info("the address== " + bean.getAddress() + " privatekey=====" + privateKey + " balance==" + balance);
+      }
+    }
+  }
+
+  /**
+   * 分发eth 或者收集usdt
+   * @param beanList
+   */
+  @Async
+  public void collectUsdtTokenToAddress(List<WalletBean> beanList) {
+    WalletTransaction transaction = new WalletTransaction(web3jUrl);
+    if (beanList != null && beanList.size() > 0) {
+      String pwd = PasswordGenerator.getPwd();
+      String collectAddress = AESUtils.decrypt(ETH_DISPATCH_ADDRESS, pwd);
+      for (WalletBean bean : beanList) {
+        try {
+          //获取用户钱包数量 usdt 数量
+          double usdtBalance = transaction.getUsdtBalance(bean.getAddress());
+          if (usdtBalance > 500) {//usdt 数量大于500
+            double ethBalance = transaction.getEthBalance(bean.getAddress()); //获取eth剩余量
+            if (ethBalance >= 0.009) { //eth 数量太少
+              BigInteger nonce = transaction.getNonce(collectAddress);
+              String hash = transaction.collectUsdt(pwd, nonce, bean.getAddress(), bean.getPrivateKey(), usdtBalance + "");
+              logger.info("schedule  collect usdt address = " + bean.getAddress() + "=====usdt balance==" + usdtBalance + "===eth balance==" + ethBalance + "=====hash ====" + hash);
+            }
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+          logger.info("schedule  collectUsdtTokenToAddress error = " + bean.getAddress(), e);
+        }
       }
     }
   }
