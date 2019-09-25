@@ -20,10 +20,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 import static com.coezal.wallet.api.enums.ResultCode.FETCH_CASH_ERROR;
 import static com.coezal.wallet.biz.util.WalletConstant.USDT_CONTRACT_ADDRESS;
@@ -144,28 +146,44 @@ public class AsyncTask {
    */
   @Async
   public void collectUsdtTokenToAddress(List<WalletBean> beanList) {
-    WalletTransaction transaction = new WalletTransaction(web3jUrl);
-    if (beanList != null && beanList.size() > 0) {
-      String pwd = PasswordGenerator.getPwd();
-      String collectAddress = AESUtils.decrypt(ETH_DISPATCH_ADDRESS, pwd);
-      for (WalletBean bean : beanList) {
-        try {
-          //获取用户钱包数量 usdt 数量
-          double usdtBalance = transaction.getUsdtBalance(bean.getAddress());
-          if (usdtBalance > 500) {//usdt 数量大于500
-            double ethBalance = transaction.getEthBalance(bean.getAddress()); //获取eth剩余量
-            if (ethBalance >= 0.009) { //eth 数量太少
-              BigInteger nonce = transaction.getNonce(collectAddress);
-              String hash = transaction.collectUsdt(pwd, nonce, bean.getAddress(), bean.getPrivateKey(), usdtBalance + "");
-              logger.info("schedule  collect usdt address = " + bean.getAddress() + "=====usdt balance==" + usdtBalance + "===eth balance==" + ethBalance + "=====hash ====" + hash);
-            }
-          }
-        } catch (Exception e) {
-          e.printStackTrace();
-          logger.info("schedule  collectUsdtTokenToAddress error = " + bean.getAddress(), e);
-        }
-      }
-    }
+//    WalletTransaction transaction = new WalletTransaction(web3jUrl);
+//    if (beanList != null && beanList.size() > 0) {
+//      String pwd = PasswordGenerator.getPwd();
+//      for (WalletBean bean : beanList) {
+//        try {
+//          //获取用户钱包数量 usdt 数量
+//          double usdtBalance = transaction.getUsdtBalance(bean.getAddress());
+//          if (usdtBalance > 500) {//usdt 数量大于500
+//            double ethBalance = transaction.getEthBalance(bean.getAddress()); //获取eth剩余量
+//            if (ethBalance >= 0.009) { //eth 数量太少
+//              BigInteger nonce = transaction.getNonce(bean.getAddress());
+//              String hash = transaction.collectUsdt(pwd, nonce, bean.getAddress(), bean.getPrivateKey(), usdtBalance + "");
+//              logger.info("schedule  collect usdt address = " + bean.getAddress() + "==private key==="+bean.getPrivateKey()+"-----usdt balance==" + usdtBalance + "===eth balance==" + ethBalance + "=====hash ====");
+//              if (hash != null) {
+//                while (true) {
+//                  Optional<TransactionReceipt> receiptOptional = transaction.getTransactionReceipt(hash);
+//                  if (receiptOptional.isPresent()) {
+//                    TransactionReceipt receipt = receiptOptional.get();
+//
+//                    logger.info("getTransactionReceipt " + hash + " status==" + receipt.getStatus());
+//                    logger.info("getTransactionReceipt " + hash + " status ok==" + receipt.isStatusOK());
+//                    logger.info("getTransactionReceipt " + hash + " gasUsed==" + receipt.getGasUsed());
+//                    logger.info("getTransactionReceipt " + hash + " blockNumber==" + receipt.getBlockNumber());
+//                    logger.info("getTransactionReceipt " + hash + " blockHash==" + receipt.getBlockHash());
+//                    break;
+//                  } else {
+//                    Thread.sleep(10000);
+//                  }
+//                }
+//              }
+//            }
+//          }
+//        } catch (Exception e) {
+//          e.printStackTrace();
+//          logger.info("schedule  collectUsdtTokenToAddress error = " + bean.getAddress(), e);
+//        }
+//      }
+//    }
   }
 
 }

@@ -18,10 +18,14 @@ import org.web3j.protocol.core.methods.response.EthCall;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static com.coezal.wallet.biz.util.WalletConstant.USDT_CONTRACT_ADDRESS;
+import static com.coezal.wallet.biz.util.WalletConstant.USDT_TOKEN_DECIMAL;
 
 /**
  * Version 1.0
@@ -35,7 +39,11 @@ public class TokenInfoUtils {
 
 
   /**
-   * 查询代币余额
+   * 查询带单位的代币余额
+   * @param web3j
+   * @param fromAddress
+   * @param contractAddress
+   * @return BigInteger 返回对应的bigInteger 对象
    */
   public static BigInteger getTokenBalance(Web3j web3j, String fromAddress, String contractAddress) {
 
@@ -65,6 +73,21 @@ public class TokenInfoUtils {
       e.printStackTrace();
     }
     return balanceValue;
+  }
+
+  /**
+   * 查询不带单位的代币余额
+   * @param web3j
+   * @param fromAddress
+   * @param contractAddress
+   * @param tokenDecimal 代币单位
+   * @return 返回日常显示的余额
+   */
+  public static double getTokenBalance(Web3j web3j, String fromAddress, String contractAddress, int tokenDecimal) {
+    BigInteger bal = getTokenBalance(web3j, fromAddress, contractAddress);
+    BigDecimal balance = new BigDecimal(bal);
+    balance = balance.divide(BigDecimal.TEN.pow(tokenDecimal));
+    return balance.doubleValue();
   }
 
   /**

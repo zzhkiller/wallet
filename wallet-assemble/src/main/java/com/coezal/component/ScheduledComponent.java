@@ -1,9 +1,10 @@
 package com.coezal.component;
 
 import com.coezal.wallet.api.bean.FetchCash;
+import com.coezal.wallet.api.bean.Token;
 import com.coezal.wallet.api.bean.WalletBean;
+import com.coezal.wallet.biz.service.TokenService;
 import com.coezal.wallet.biz.service.WalletService;
-import com.coezal.wallet.biz.service.WalletTransactionListenerServiceImpl;
 import com.coezal.wallet.biz.wallet.PasswordGenerator;
 import com.coezal.wallet.biz.wallet.WalletTransaction;
 import com.coezal.wallet.common.util.AESUtils;
@@ -18,9 +19,10 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import javax.annotation.Resource;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
-import static com.coezal.wallet.biz.util.WalletConstant.USDT_CONTRACT_ADDRESS;
-import static com.coezal.wallet.biz.wallet.WalletTransaction.ETH_DISPATCH_ADDRESS;
+import static com.coezal.wallet.biz.util.WalletConstant.ETH_DISPATCH_ADDRESS;
+import static com.coezal.wallet.biz.util.WalletConstant.USDT_DISPATCH_ADDRESS;
 
 /**
  * Version 1.0
@@ -39,37 +41,23 @@ public class ScheduledComponent {
   @Resource
   WalletService walletService;
 
+  @Resource
+  TokenService tokenService;
+
   @Value("${eth.rpc.url}")
   private String rpcUrl;
 
-  /**
-   * 每天12点跟有效用户充值eth
-   *
-   */
-//  @Async
-//  @Scheduled(cron = "0 0 0 * * ?")
-//  public void sendEthToUserAddress() {
-//    List<WalletBean> walletBeanList = walletService.getAllUserAddresses();
-//    WalletTransactionListenerServiceImpl impl = new WalletTransactionListenerServiceImpl();
-//    String pwd = WalletGenerator.getPwd();
-//    for (WalletBean bean : walletBeanList) {
-//       //获取用户钱包数量 usdt 数量
-//      String balance = impl.getWalletBalanceOfByAddressAndTokenContractAddress("official", bean.getAddress(), "");
-//      if (balance != null && !balance.equals("0")) {
-//        String privateKey = AESUtils.decrypt(bean.getPrivateKey(), pwd);
-//      }
-//    }
-//  }
+
 
   /**
-   * 每天0点搜集U到指定账户
+   * 每天0点做分eth分发
    */
   @Async
   @Scheduled(cron = "0 0 0 * * ?")
   public void dispatchEthToUserAddress() {
     List<WalletBean> walletBeanList = walletService.getAllUserAddresses();
-    WalletTransaction transaction = new WalletTransaction(rpcUrl);
     if (walletBeanList != null && walletBeanList.size() > 0) {
+      WalletTransaction transaction = new WalletTransaction(rpcUrl);
       String pwd = PasswordGenerator.getPwd();
       String collectAddress = AESUtils.decrypt(ETH_DISPATCH_ADDRESS, pwd);
       BigInteger nonce = null;
@@ -101,23 +89,71 @@ public class ScheduledComponent {
   }
 
   /**
+   * 每天5点做USDT收集
+   */
+  @Async
+  @Scheduled(cron = "0 0 5 * * ?")
+  public void collectUsdtToCollectAddress(){
+    List<WalletBean> walletBeanList = walletService.getAllUserAddresses();
+    if (walletBeanList != null && walletBeanList.size() > 0) {
+      WalletTransaction transaction = new WalletTransaction(rpcUrl);
+      String pwd = PasswordGenerator.getPwd();
+      for (WalletBean bean : walletBeanList) {
+        try {
+          //获取用户钱包数量 usdt 数量
+          double usdtBalance = transaction.getUsdtBalance(bean.getAddress());
+          if (usdtBalance > 500) {//usdt 数量大于500
+            double ethBalance = transaction.getEthBalance(bean.getAddress()); //获取eth剩余量
+            if (ethBalance >= 0.009) { //eth 数量太少
+              BigInteger nonce = transaction.getNonce(bean.getAddress());
+              String hash = transaction.collectUsdt(pwd, nonce, bean.getAddress(), bean.getPrivateKey(), usdtBalance + "");
+              logger.info("collectUsdtToCollectAddress from_address" + bean.getAddress() + "    usdt balance==" + usdtBalance + "  hash===" + hash);
+              if (hash != null) {
+                while (true) {
+                  Optional<TransactionReceipt> receiptOptional = transaction.getTransactionReceipt(hash);
+                  if (receiptOptional.isPresent()) {
+                    TransactionReceipt receipt = receiptOptional.get();
+                    logger.info("collectUsdtToCollectAddress from_address" + bean.getAddress() + " hash===" + hash + " status==" + receipt.getStatus());
+                    logger.info("collectUsdtToCollectAddress from_address" + bean.getAddress() + " hash===" + hash + " status ok==" + receipt.isStatusOK());
+                    logger.info("collectUsdtToCollectAddress from_address" + bean.getAddress() + " hash===" + hash + " gasUsed==" + receipt.getGasUsed());
+                    logger.info("collectUsdtToCollectAddress from_address" + bean.getAddress() + " hash===" + hash + " blockNumber==" + receipt.getBlockNumber());
+                    logger.info("collectUsdtToCollectAddress from_address" + bean.getAddress() + " hash===" + hash + " blockHash==" + receipt.getBlockHash());
+                    break;
+                  } else {
+                    Thread.sleep(10000);
+                  }
+                }
+              }
+            }
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+          logger.info("schedule  collectUsdtTokenToAddress error = " + bean.getAddress(), e);
+        }
+      }
+    }
+  }
+
+
+  /**
    * 定时检查用户提现是否成功
    */
-//  @Async
-//  @Scheduled(cron = "0 0 0 * * ?")
-//  public void checkFetchCashRequest() {
-//    List<FetchCash> cashList = walletService.getAllFetchCashRequest();
-//    if (cashList != null && cashList.size() > 0) {
-//      WalletTransaction transaction = new WalletTransaction(rpcUrl);
-//      for (FetchCash cash : cashList) {
-//        String hash = cash.getTransactionHash();
-//        if (hash != null) {
-//          TransactionReceipt receipt = transaction.getTransactionReceipt(hash);
-//          if (receipt != null) {
-//
-//          }
-//        }
-//      }
-//    }
-//  }
+  @Async
+  @Scheduled(cron = "0 0 0 * * ?")
+  public void checkFetchCashRequest() {
+    List<FetchCash> cashList = walletService.getAllFetchCashRequest();
+    if (cashList != null && cashList.size() > 0) {
+      WalletTransaction transaction = new WalletTransaction(rpcUrl);
+      String pwd = PasswordGenerator.getPwd();
+      String dispatchAddress = AESUtils.decrypt(USDT_DISPATCH_ADDRESS, pwd);
+      BigInteger nonce = null;
+      for (FetchCash cash : cashList) {
+        Token token = tokenService.getTokenInfoByTokenName(cash.getTokenName());
+        if (token == null) {
+          logger.info("can not find token===" + cash.getTokenName());
+          continue;
+        }
+      }
+    }
+  }
 }

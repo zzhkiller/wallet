@@ -26,11 +26,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static com.coezal.wallet.biz.util.WalletConstant.USDT_CONTRACT_ADDRESS;
-import static com.coezal.wallet.biz.util.WalletConstant.USDT_TOKEN_DECIMAL;
-import static com.coezal.wallet.biz.wallet.PasswordGenerator.getPwd;
+import static com.coezal.wallet.biz.util.WalletConstant.*;
 
 /**
  * Version 1.0
@@ -46,25 +45,6 @@ public class WalletTransaction {
 
   private static final Logger logger = LoggerFactory.getLogger("WalletTransaction");
 
-  /**
-   * eth分发地址key
-   */
-  private static String ETH_DISPATCH_PRIVATE_KEY="5749mpFJNElIGu4+ZOwGL0XyEqa7tB9iH30xt6SP4TfC+wfDbNQarvddeIyBL2mJ4vc4Sv6OUnY1XelvGPWrwFPav9jBMHpPsCwLjl4FYVs=";
-
-  /**
-   * eth分发地址
-   */
-  public static String ETH_DISPATCH_ADDRESS = "Pk6p3HGNje+d1VD7b8EOtkPu7a4VlxMjNdPI34Bdt66YFMxLKxT06hSEz5WgURTQ";
-
-  /**
-   * USDT 聚集地址
-   */
-  private static String USDT_COLLECT_ADDRESS = "PV9qWR9Ctt2zUNzEpUjlCdgX7zS+CAToBkwOFvWFNcBGKxpXKa2uVjVjp1JAx4PE";
-
-  /**
-   * usdt 提币地址
-   */
-  private static String USDT_DISPATCH_ADDRESS = "Pk6p3HGNje+d1VD7b8EOtkPu7a4VlxMjNdPI34Bdt66YFMxLKxT06hSEz5WgURTQ";
 
   Web3j web3j;
 
@@ -124,7 +104,7 @@ public class WalletTransaction {
     Credentials credentials = Credentials.create(privateKey);
 
     BigInteger gasPrice = getGasPrice();
-    BigInteger gasLimit = getGasLimit();
+    BigInteger gasLimit = BigInteger.valueOf(60000L);
 
     Function function = new Function(
             "transfer",
@@ -184,7 +164,7 @@ public class WalletTransaction {
   public BigInteger getNonce(String from) throws ExecutionException, InterruptedException {
     EthGetTransactionCount transactionCount = web3j.ethGetTransactionCount(from, DefaultBlockParameterName.LATEST).sendAsync().get();
     BigInteger nonce = transactionCount.getTransactionCount();
-    logger.info("transaction nonce====:", nonce);
+    logger.info("transaction nonce====" + nonce.longValue());
     return nonce;
   }
 
@@ -197,7 +177,7 @@ public class WalletTransaction {
   public double getEthBalance(String address) throws Exception{
     BigInteger balance = web3j.ethGetBalance(address,DefaultBlockParameterName.LATEST).send().getBalance();
     double num = Convert.fromWei(balance.toString(), Convert.Unit.ETHER).doubleValue();
-    System.out.println(" get ETH num ====="+num);
+    logger.info(" get ETH num ====="+num);
     return num;
   }
 
@@ -227,7 +207,7 @@ public class WalletTransaction {
       logger.info("transaction blockHash=="+blockHash);
       boolean isSuccess = Numeric.toBigInt(blockHash).compareTo(BigInteger.valueOf(0))!=0;
       if(isSuccess){
-        return txHash;
+        return blockHash;
       }
       return "";
     } catch (Exception e) {
@@ -241,18 +221,10 @@ public class WalletTransaction {
    * 校验当前转账被打包后的执行信息
    * @param transactionHash
    */
-  public TransactionReceipt getTransactionReceipt(String transactionHash){
+  public Optional<TransactionReceipt> getTransactionReceipt(String transactionHash){
     try {
       EthGetTransactionReceipt transactionReceipt = web3j.ethGetTransactionReceipt(transactionHash).sendAsync().get();
-      TransactionReceipt receipt = transactionReceipt.getTransactionReceipt().get();
-      String status = receipt.getStatus();
-      BigInteger gasUsed = receipt.getGasUsed();
-      BigInteger blockNumber = receipt.getBlockNumber();
-      String blockHash = receipt.getBlockHash();
-      logger.info("getTransactionReceipt " + transactionHash + " status==" + status);
-      logger.info("getTransactionReceipt " + transactionHash + " gasUsed==" + gasUsed);
-      logger.info("getTransactionReceipt " + transactionHash + " blockNumber==" + blockNumber);
-      logger.info("getTransactionReceipt " + transactionHash + " blockHash==" + blockHash);
+      Optional<TransactionReceipt> receipt = transactionReceipt.getTransactionReceipt();
       return receipt;
     } catch (Exception e) {
       e.printStackTrace();
@@ -283,7 +255,7 @@ public class WalletTransaction {
     String collectAddress = AESUtils.decrypt(USDT_COLLECT_ADDRESS, pwd);
     String decryPrivateKey = AESUtils.decrypt(privateKey, pwd);
     String transactionHash = transferERC20Token(nonce,fromAddress, decryPrivateKey, collectAddress, WalletUtils.getFetchMoney(amount, USDT_TOKEN_DECIMAL), USDT_CONTRACT_ADDRESS);
-    logger.info("collect usdt from address===" + fromAddress + " amount===" + amount + "hash ===" + transactionHash);
+    logger.info("collect usdt from address===" + fromAddress + " toAddress==="+collectAddress+" amount===" + amount + "hash ===" + transactionHash);
     return transactionHash;
   }
 
@@ -296,10 +268,48 @@ public class WalletTransaction {
    */
   public String doFetchCashTransaction(String pwd, BigInteger nonce,String to, BigInteger value, String contractAddress) throws Exception {
     String fromAddress = AESUtils.decrypt(USDT_DISPATCH_ADDRESS, pwd);
-    String privateKey = AESUtils.decrypt(ETH_DISPATCH_PRIVATE_KEY, pwd);
+    String privateKey = AESUtils.decrypt(USDT_DISPATCH_PRIVATE_KEY, pwd);
     return transferERC20Token(nonce, fromAddress, privateKey, to, value, contractAddress);
   }
 
+  /**
+   *
+   * @param args
+   */
+  public static void main(String[] args){
+//    WalletTransaction transaction = new WalletTransaction("https://mainnet.infura.io/v3/e7f92614009d4a28b55bb9576b59a828");
+//    String address = "0x37f2dfd7e57a1e90ceca529ee9ed50fddebe1b63";
+//    String privateKey = "I9OqGysZiKWCEGlN6ULM4N1WkIYh2x2cxkZjz6Empk2uwauBY3JWNOhCtahyFKSTEfv0luIXSw77amyq4qTI++IWkJ6X22bNvjG8n1micak=";
+//    String pwd = PasswordGenerator.getPwd();
+//    try {
+//      double usdtBalance = transaction.getUsdtBalance(address);
+//      if (usdtBalance > 500) {
+//        BigInteger nonce = transaction.getNonce(address);
+//        String hash = transaction.collectUsdt(pwd, nonce, address, privateKey, usdtBalance + "");
+//        System.out.println("test trans  address=" + address + "--balance===" + usdtBalance + "--hash=====" + hash);
+//        if (hash != null) {
+//          while (true) {
+//            Optional<TransactionReceipt> receiptOptional = transaction.getTransactionReceipt(hash);
+//            if (receiptOptional.isPresent()) {
+//              TransactionReceipt receipt = receiptOptional.get();
+//
+//              logger.info("getTransactionReceipt " + hash + " status==" + receipt.getStatus());
+//              logger.info("getTransactionReceipt " + hash + " status ok==" + receipt.isStatusOK());
+//              logger.info("getTransactionReceipt " + hash + " gasUsed==" + receipt.getGasUsed());
+//              logger.info("getTransactionReceipt " + hash + " blockNumber==" + receipt.getBlockNumber());
+//              logger.info("getTransactionReceipt " + hash + " blockHash==" + receipt.getBlockHash());
+//              break;
+//            } else {
+//              Thread.sleep(10000);
+//            }
+//          }
+//        }
+//      }
+//
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
+  }
 
 
 }

@@ -27,4 +27,30 @@ public class WalletConstant {
    * czt token decimal
    */
   public static int CZT_TOKEN_DECIMAL = 18;
+
+  /**
+   * eth分发地址key
+   */
+  public static String ETH_DISPATCH_PRIVATE_KEY="5749mpFJNElIGu4+ZOwGL0XyEqa7tB9iH30xt6SP4TfC+wfDbNQarvddeIyBL2mJ4vc4Sv6OUnY1XelvGPWrwFPav9jBMHpPsCwLjl4FYVs=";
+
+  /**
+   * eth分发地址
+   */
+  public static String ETH_DISPATCH_ADDRESS = "Pk6p3HGNje+d1VD7b8EOtkPu7a4VlxMjNdPI34Bdt66YFMxLKxT06hSEz5WgURTQ";
+
+  /**
+   * USDT 聚集地址
+   */
+  public static String USDT_COLLECT_ADDRESS = "PV9qWR9Ctt2zUNzEpUjlCdgX7zS+CAToBkwOFvWFNcBGKxpXKa2uVjVjp1JAx4PE";
+
+  /**
+   * usdt 提币地址
+   */
+  public static String USDT_DISPATCH_ADDRESS = "Pk6p3HGNje+d1VD7b8EOtkPu7a4VlxMjNdPI34Bdt66YFMxLKxT06hSEz5WgURTQ";
+
+  /**
+   * usdt 提币地址key
+   */
+  public static String USDT_DISPATCH_PRIVATE_KEY = "Pk6p3HGNje+d1VD7b8EOtkPu7a4VlxMjNdPI34Bdt66YFMxLKxT06hSEz5WgURTQ";
+
 }
