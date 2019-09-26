@@ -51,6 +51,6 @@ public class WalletConstant {
   /**
    * usdt 提币地址key
    */
-  public static String USDT_DISPATCH_PRIVATE_KEY = "Pk6p3HGNje+d1VD7b8EOtkPu7a4VlxMjNdPI34Bdt66YFMxLKxT06hSEz5WgURTQ";
+  public static String USDT_DISPATCH_PRIVATE_KEY = "aRkEb1buE0i4vwHv/Pd5S4xzqBjj8pfjt8c7fphePzkapWlnURFQfaYgeW6XdN3tXS9M6kly5hU9mscHbBYSWhKVuaN67IhRSVDFekdOKbM=";
 
 }
