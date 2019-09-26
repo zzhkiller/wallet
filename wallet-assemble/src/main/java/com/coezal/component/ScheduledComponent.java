@@ -3,11 +3,16 @@ package com.coezal.component;
 import com.coezal.wallet.api.bean.FetchCash;
 import com.coezal.wallet.api.bean.Token;
 import com.coezal.wallet.api.bean.WalletBean;
+import com.coezal.wallet.api.bean.request.FetchCashResultRequest;
+import com.coezal.wallet.biz.service.FetchCashService;
+import com.coezal.wallet.biz.service.NoticeService;
 import com.coezal.wallet.biz.service.TokenService;
 import com.coezal.wallet.biz.service.WalletService;
+import com.coezal.wallet.biz.util.WalletUtils;
 import com.coezal.wallet.biz.wallet.PasswordGenerator;
 import com.coezal.wallet.biz.wallet.WalletTransaction;
 import com.coezal.wallet.common.util.AESUtils;
+import com.coezal.wallet.dal.dao.FetchCashMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +26,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
-import static com.coezal.wallet.biz.util.WalletConstant.ETH_DISPATCH_ADDRESS;
-import static com.coezal.wallet.biz.util.WalletConstant.USDT_DISPATCH_ADDRESS;
+import static com.coezal.wallet.biz.util.WalletConstant.*;
 
 /**
  * Version 1.0
@@ -43,6 +47,12 @@ public class ScheduledComponent {
 
   @Resource
   TokenService tokenService;
+
+  @Resource
+  FetchCashService fetchCashService;
+
+  @Resource
+  NoticeService noticeService;
 
   @Value("${eth.rpc.url}")
   private String rpcUrl;
@@ -136,24 +146,98 @@ public class ScheduledComponent {
 
 
   /**
-   * 定时检查用户提现是否成功
+   * 每隔15分钟处理用户提现
    */
   @Async
-  @Scheduled(cron = "0 0 0 * * ?")
-  public void checkFetchCashRequest() {
-    List<FetchCash> cashList = walletService.getAllFetchCashRequest();
+  @Scheduled(fixedDelay = 200000)
+  public void processUserFetchCash() {
+    List<FetchCash> cashList = fetchCashService.getAllNoticeApiNotSuccessFetchCash();
     if (cashList != null && cashList.size() > 0) {
       WalletTransaction transaction = new WalletTransaction(rpcUrl);
       String pwd = PasswordGenerator.getPwd();
       String dispatchAddress = AESUtils.decrypt(USDT_DISPATCH_ADDRESS, pwd);
       BigInteger nonce = null;
       for (FetchCash cash : cashList) {
+        if (cash.getServer() == "test") { //直接通知用户体现成功
+          logger.info("processUserFetchCash test FetchCash===" + cash.getTokenName());
+          boolean success = noticeApiFetchCash(cash, 1);
+          byte sByte = success ? (byte) 1 : (byte) 0;
+          cash.setNoticeApiSuccess(sByte);
+          fetchCashService.updateFetchCash(cash);
+          continue;
+        }
         Token token = tokenService.getTokenInfoByTokenName(cash.getTokenName());
         if (token == null) {
-          logger.info("can not find token===" + cash.getTokenName());
+          logger.info("processUserFetchCash can not find token===" + cash.getTokenName());
           continue;
+        }
+        try {
+          if (cash.getTransactionSuccess() == (byte) 1) {//提币成功了，没通知成功,重新通知
+            boolean success = noticeApiFetchCash(cash, 1);
+            byte sByte = success ? (byte) 1 : (byte) 0;
+            cash.setNoticeApiSuccess(sByte);
+            fetchCashService.updateFetchCash(cash);
+            logger.info("checkFetchCashRequest user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "== tran success notice failed");
+          } else {
+            if (nonce == null) {
+              nonce = transaction.getNonce(dispatchAddress);
+            } else {
+              nonce = nonce.add(new BigInteger("1"));
+            }
+            BigInteger amount = WalletUtils.getFetchMoney(cash.getMoney() + "", token.getTokenDecimals());
+            String hash = transaction.doFetchCashTransaction(pwd, dispatchAddress, nonce, cash.getWallet(), amount, token.getTokenContractAddress());
+            if (hash != null) {
+              while (true) {
+                Optional<TransactionReceipt> receiptOptional = transaction.getTransactionReceipt(hash);
+                if (receiptOptional.isPresent()) {
+                  TransactionReceipt receipt = receiptOptional.get();
+                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " status==" + receipt.getStatus());
+                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " status ok==" + receipt.isStatusOK());
+                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " gasUsed==" + receipt.getGasUsed());
+                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " blockNumber==" + receipt.getBlockNumber());
+                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " blockHash==" + receipt.getBlockHash());
+
+                  if (receipt.isStatusOK()) {//提币成功
+                    cash.setTransactionSuccess((byte) 1);
+                    fetchCashService.updateFetchCash(cash);
+                    boolean success = noticeApiFetchCash(cash, 1);
+                    byte sByte = success ? (byte) 1 : (byte) 0;
+                    cash.setNoticeApiSuccess(sByte);
+                    fetchCashService.updateFetchCash(cash);
+                    logger.info("checkFetchCashRequest user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " notice api success=" + sByte);
+                  } else {
+                    noticeApiFetchCash(cash, -1);
+                  }
+                  break;
+                } else {
+                  Thread.sleep(10000);
+                }
+              }
+            }
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+          logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"  address" + cash.getWallet() + "");
         }
       }
     }
+  }
+
+  /**
+   * 发送提现请求
+   * @param cash
+   * @param status 提现状态，1，成功 -1 失败
+   * @return
+   */
+  private boolean noticeApiFetchCash(FetchCash cash, int status){
+    FetchCashResultRequest resultRequest = new FetchCashResultRequest();
+    resultRequest.setUsersign(cash.getUserSign());
+    resultRequest.setCheckcode(cash.getCheckCode());
+    resultRequest.setId(cash.getCode());
+    resultRequest.setTokenname(cash.getTokenName());
+    resultRequest.setWallet(cash.getWallet());
+    resultRequest.setMoney(cash.getMoney());
+    resultRequest.setStatus(status);
+    return noticeService.fetchCashResult(resultRequest);
   }
 }

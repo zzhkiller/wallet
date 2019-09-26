@@ -266,8 +266,7 @@ public class WalletTransaction {
    * @param contractAddress
    * @return
    */
-  public String doFetchCashTransaction(String pwd, BigInteger nonce,String to, BigInteger value, String contractAddress) throws Exception {
-    String fromAddress = AESUtils.decrypt(USDT_DISPATCH_ADDRESS, pwd);
+  public String doFetchCashTransaction(String pwd, String fromAddress, BigInteger nonce,String to, BigInteger value, String contractAddress) throws Exception {
     String privateKey = AESUtils.decrypt(USDT_DISPATCH_PRIVATE_KEY, pwd);
     return transferERC20Token(nonce, fromAddress, privateKey, to, value, contractAddress);
   }

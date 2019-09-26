@@ -6,31 +6,20 @@ import com.coezal.wallet.api.excetion.BizException;
 import com.coezal.wallet.biz.service.NoticeService;
 import com.coezal.wallet.biz.service.WalletTransactionListenerServiceImpl;
 import com.coezal.wallet.biz.util.WalletUtils;
-import com.coezal.wallet.biz.wallet.PasswordGenerator;
-import com.coezal.wallet.biz.wallet.WalletGenerator;
-import com.coezal.wallet.biz.wallet.WalletTransaction;
 import com.coezal.wallet.common.util.AESUtils;
 import com.coezal.wallet.dal.dao.FetchCashMapper;
 import com.coezal.wallet.dal.dao.TokenTransactionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-import org.web3j.protocol.core.methods.response.EthSendTransaction;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import javax.annotation.Resource;
-import java.math.BigInteger;
 import java.util.List;
-import java.util.Optional;
 
 import static com.coezal.wallet.api.enums.ResultCode.FETCH_CASH_ERROR;
-import static com.coezal.wallet.biz.util.WalletConstant.USDT_CONTRACT_ADDRESS;
 import static com.coezal.wallet.biz.wallet.PasswordGenerator.getPwd;
-import static com.coezal.wallet.biz.wallet.WalletTransaction.ETH_DISPATCH_ADDRESS;
 
 /**
  * Version 1.0
@@ -53,8 +42,8 @@ public class AsyncTask {
   @Resource
   FetchCashMapper mapper;
 
-  @Value("${eth.rpc.url}")
-  String web3jUrl;
+//  @Value("${eth.rpc.url}")
+//  String web3jUrl;
 
   /**
    * 异步检查用户充值记录
@@ -89,6 +78,14 @@ public class AsyncTask {
     }
   }
 
+  /**
+   * 通知api充值成功
+   * @param userSign
+   * @param checkCode
+   * @param userWalletAddress
+   * @param transaction
+   * @return
+   */
   private boolean sendRechargeNotice(String userSign, String checkCode, String userWalletAddress, TokenTransaction transaction) {
     RechargeRequest rechargeRequest = new RechargeRequest();
     rechargeRequest.setUsersign(userSign);
@@ -102,26 +99,6 @@ public class AsyncTask {
   }
 
 
-  /**
-   * 异步提现
-   * @param userSign
-   * @param checkCode
-   * @param id
-   * @param cash
-   */
-  @Async
-  public void doFetchCashRequest(String userSign, String checkCode, long id, FetchCash cash, Token token) {
-    CheckFetchCashRequest request = new CheckFetchCashRequest();
-    request.setUsersign(userSign);
-    request.setCheckcode(checkCode);
-    request.setId(id);
-    boolean checkFetch = noticeService.checkFetchCash(request);
-    if (checkFetch) { //校验通过，
-      mapper.insert(cash);//转账
-    } else {
-      throw new BizException(FETCH_CASH_ERROR);
-    }
-  }
 
   /**
    * 获取有用户关联的钱包地址余额

@@ -29,12 +29,7 @@ public interface WalletService {
   PayCheckResponse payCheck(String dataStr);
 
 
-  /**
-   * 请求提现
-   * @param dataStr
-   * @return
-   */
-  String getRequest(String dataStr);
+
 
   /**
    * 获取所有用户的钱包地址
@@ -48,12 +43,5 @@ public interface WalletService {
    * @return
    */
   void paySearch(String dataStr);
-
-  /**
-   * 获取所有请求提现列表
-   * @return
-   */
-  List<FetchCash> getAllFetchCashRequest();
-
 
 }

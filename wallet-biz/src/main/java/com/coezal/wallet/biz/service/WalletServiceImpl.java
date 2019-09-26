@@ -30,26 +30,18 @@ import static com.coezal.wallet.api.enums.ResultCode.*;
  */
 
 @Service
-public class WalletServiceImpl implements WalletService {
+public class WalletServiceImpl extends BaseService implements WalletService {
 
-  @Resource
-  WalletBeanMapper walletMapper;
 
   @Resource
   TokenTransactionMapper tokenTransactionMapper;
 
-  @Resource
-  TokenMapper tokenMapper;
-
-  @Resource
-  FetchCashMapper fetchCashMapper;
 
   @Autowired
   AsyncTask asyncTask;
 
 
 
-  private static String salt = "gQ#D63K*QW%U9l@X";
 
   private static final Logger logger = LoggerFactory.getLogger("WalletServiceImpl");
 
@@ -144,46 +136,6 @@ public class WalletServiceImpl implements WalletService {
     }
   }
 
-  /**
-   * 提现请求
-   * @param dataStr
-   * @return
-   */
-  @Override
-  public String getRequest(String dataStr) {
-    String paramJson = null;
-    try {
-      paramJson = RSACoder.decryptAPIParams(dataStr);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    FetchCashRequest fetchCashRequest = JsonUtil.decode(paramJson, FetchCashRequest.class);
-    //1、校验参数
-    checkFetchCashRequest(fetchCashRequest);
-
-    //2、校验token是否存在
-    Token token = getToken(fetchCashRequest.getTokenname());
-    //3、校验用户钱包是否存在
-    getUserWalletBean(fetchCashRequest.getUsersign()+"|"+ fetchCashRequest.getCheckcode());
-
-    //4、校验相同提现请求是否已经存在
-    FetchCash cash = new FetchCash();
-    cash.setCode(fetchCashRequest.getId());
-    cash.setMd5chk(fetchCashRequest.getMd5chk());
-    cash.setUserSign(fetchCashRequest.getUsersign());
-    cash.setCheckCode(fetchCashRequest.getCheckcode());
-    cash.setMoney(fetchCashRequest.getMoney());
-    cash.setTokenName(fetchCashRequest.getTokenname());
-    cash.setServer(fetchCashRequest.getServer());
-    cash.setTime(new Date(fetchCashRequest.getTime()));
-    FetchCash result = fetchCashMapper.selectOne(cash);
-    if (result != null) { //提现请求已经存在
-      throw new BizException(FETCH_CASH_EXIT);
-    }
-
-    asyncTask.doFetchCashRequest(fetchCashRequest.getUsersign(), fetchCashRequest.getCheckcode(), fetchCashRequest.getId(), cash, token);
-    return "";
-  }
 
   /**
    * 返回所有关联过用户的钱包地址
@@ -191,10 +143,9 @@ public class WalletServiceImpl implements WalletService {
    */
   @Override
   public List<WalletBean> getAllUserAddresses() {
-
     List<WalletBean> beanList = walletMapper.selectAllUsedAddress();
 
-    asyncTask.collectUsdtTokenToAddress(beanList);
+//    asyncTask.collectUsdtTokenToAddress(beanList);
     return beanList;
   }
 
@@ -231,37 +182,9 @@ public class WalletServiceImpl implements WalletService {
     asyncTask.checkUserRecharge(resultBean.getAddress(), resultToken.getTokenContractAddress(), paySearchRequest.getServer(), paySearchRequest.getUsersign(), paySearchRequest.getCheckcode());
   }
 
-  /**
-   * 获取所有提现
-   * @return
-   */
-  @Override
-  public List<FetchCash> getAllFetchCashRequest() {
-    FetchCash cash = new FetchCash();
-    cash.setTransactionSuccess((byte)0);
-    List<FetchCash> cashList = fetchCashMapper.select(cash);
-    return cashList;
-  }
 
-  private WalletBean getUserWalletBean(String usrInfo) {
-    WalletBean bean = new WalletBean();
-    bean.setOwnerInfo(usrInfo);
-    WalletBean resultBean = walletMapper.selectOne(bean);
-    if (resultBean == null || resultBean.getAddress() == null) {
-      throw new BizException(WALLET_NOT_EXIT);
-    }
-    return resultBean;
-  }
 
-  private Token getToken(String tokenSymbol){
-    Token token = new Token();
-    token.setTokenSymbol(tokenSymbol);
-    Token resultToken = tokenMapper.selectOne(token);
-    if(resultToken == null){
-      throw new BizException(TOKEN_NOT_EXIT);
-    }
-    return resultToken;
-  }
+
 
 
   private void checkWalletAddressRequestParams(WalletAddressRequest walletAddressRequest) {
@@ -288,16 +211,7 @@ public class WalletServiceImpl implements WalletService {
     }
   }
 
-  private void checkFetchCashRequest(FetchCashRequest fetchCashRequest) {
-    StringBuilder sb=new StringBuilder();
-    sb.append(fetchCashRequest.getUsersign());
-    sb.append(fetchCashRequest.getCheckcode());
-    sb.append(fetchCashRequest.getId());
-    sb.append(salt);
-    if(!Objects.equals(fetchCashRequest.getMd5chk(), Md5Util.MD5(sb.toString()))){
-      throw new BizException(MD5_CHECK_ERROR);
-    }
-  }
+
 
   private void checkPaySearchRequest(PaySearchRequest paySearchRequest) {
     StringBuilder sb=new StringBuilder();

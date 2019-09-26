@@ -40,7 +40,11 @@ public class FetchCash {
     /**提现hash，可为空，但是唯一*/
     private String transactionHash;
 
-    private byte transactionSuccess; //转账是否成功：0不成功，1成功
+    /**转账是否成功：0不成功，1成功*/
+    private byte transactionSuccess;
+
+    /**通知API体现成功是否成功 0不成功，1成功*/
+    private byte noticeApiSuccess;
 
     public Long getId() {
         return id;
@@ -138,6 +142,14 @@ public class FetchCash {
         this.transactionSuccess = transactionSuccess;
     }
 
+    public byte getNoticeApiSuccess() {
+        return noticeApiSuccess;
+    }
+
+    public void setNoticeApiSuccess(byte noticeApiSuccess) {
+        this.noticeApiSuccess = noticeApiSuccess;
+    }
+
     @Override
     public String toString() {
         return "FetchCash{" +
@@ -153,6 +165,7 @@ public class FetchCash {
                 ", md5chk='" + md5chk + '\'' +
                 ", transactionHash='" + transactionHash + '\'' +
                 ", transactionSuccess=" + transactionSuccess +
+                ", noticeApiSuccess=" + noticeApiSuccess +
                 '}';
     }
 }
