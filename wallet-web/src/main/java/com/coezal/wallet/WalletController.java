@@ -6,6 +6,7 @@ import com.coezal.wallet.api.bean.PayCheckResponse;
 import com.coezal.wallet.api.bean.WalletBean;
 import com.coezal.wallet.api.rest.WalletApi;
 import com.coezal.wallet.api.vo.base.BaseResponse;
+import com.coezal.wallet.biz.service.FetchCashService;
 import com.coezal.wallet.biz.service.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,9 @@ public class WalletController extends AbstractController implements WalletApi {
   @Resource
   WalletService walletService;
 
+  @Resource
+  FetchCashService fetchCashService;
+
   private static final Logger logger  = LoggerFactory.getLogger("WalletController");
 
   @Override
@@ -41,7 +45,7 @@ public class WalletController extends AbstractController implements WalletApi {
 
   @Override
   public BaseResponse<String> getRequest(String datastr) {
-    return buildJson(walletService.getRequest(datastr));
+    return buildJson(fetchCashService.getRequest(datastr));
   }
 
   @Override

@@ -1,9 +1,6 @@
 package com.coezal.wallet.biz.service;
 
-import com.coezal.wallet.api.bean.FetchCashResponse;
-import com.coezal.wallet.api.bean.GetAddressResponse;
-import com.coezal.wallet.api.bean.PayCheckResponse;
-import com.coezal.wallet.api.bean.WalletBean;
+import com.coezal.wallet.api.bean.*;
 import com.coezal.wallet.api.vo.base.BaseResponse;
 
 import java.util.List;
@@ -23,6 +20,7 @@ public interface WalletService {
    */
   GetAddressResponse getWalletAddress(String param);
 
+
   /**
    * 校验充值请求是否真实
    * @param dataStr
@@ -30,12 +28,8 @@ public interface WalletService {
    */
   PayCheckResponse payCheck(String dataStr);
 
-  /**
-   * 请求提现
-   * @param dataStr
-   * @return
-   */
-  String getRequest(String dataStr);
+
+
 
   /**
    * 获取所有用户的钱包地址
@@ -49,4 +43,5 @@ public interface WalletService {
    * @return
    */
   void paySearch(String dataStr);
+
 }

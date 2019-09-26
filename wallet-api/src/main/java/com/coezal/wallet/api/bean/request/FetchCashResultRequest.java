@@ -8,13 +8,14 @@ public class FetchCashResultRequest {
 
     private String checkcode;
 
-    private String id;
+    /**提现请求的id*/
+    private Long id;
 
     private String  tokenname;
 
     private String wallet;
 
-    private String money;
+    private Float money;
 
     private Integer status;
 
@@ -38,13 +39,6 @@ public class FetchCashResultRequest {
         this.checkcode = checkcode;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getTokenname() {
         return tokenname;
@@ -62,11 +56,19 @@ public class FetchCashResultRequest {
         this.wallet = wallet;
     }
 
-    public String getMoney() {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Float getMoney() {
         return money;
     }
 
-    public void setMoney(String money) {
+    public void setMoney(Float money) {
         this.money = money;
     }
 

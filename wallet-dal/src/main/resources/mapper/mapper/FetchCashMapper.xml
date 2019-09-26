@@ -12,9 +12,12 @@
     <result column="money" jdbcType="REAL" property="money" />
     <result column="time" jdbcType="TIMESTAMP" property="time" />
     <result column="md5chk" jdbcType="VARCHAR" property="md5chk" />
+    <result column="transaction_hash" jdbcType="VARCHAR" property="transactionHash" />
+    <result column="transaction_success" jdbcType="TINYINT" property="transactionSuccess" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, code, server, user_sign, check_code, token_name, wallet, money, time, md5chk
+    id, code, server, user_sign, check_code, token_name, wallet, money, time, md5chk,
+    transaction_hash, transaction_success
   </sql>
   <insert id="insert" parameterType="com.coezal.wallet.api.bean.FetchCash">
     <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -49,6 +52,12 @@
       <if test="md5chk != null">
         md5chk,
       </if>
+      <if test="transactionHash != null">
+        transaction_hash,
+      </if>
+      <if test="transactionSuccess != null">
+        transaction_success,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="code != null">
@@ -77,6 +86,12 @@
       </if>
       <if test="md5chk != null">
         #{md5chk,jdbcType=VARCHAR},
+      </if>
+      <if test="transactionHash != null">
+        #{transactionHash,jdbcType=VARCHAR},
+      </if>
+      <if test="transactionSuccess != null">
+        #{transactionSuccess,jdbcType=TINYINT},
       </if>
     </trim>
   </insert>
@@ -110,6 +125,12 @@
       <if test="md5chk != null">
         md5chk = #{md5chk,jdbcType=VARCHAR},
       </if>
+      <if test="transactionHash != null">
+        transaction_hash = #{transactionHash,jdbcType=VARCHAR},
+      </if>
+      <if test="transactionSuccess != null">
+        transaction_success = #{transactionSuccess,jdbcType=TINYINT},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -118,74 +139,86 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from fetch_cash
     where id = #{id,jdbcType=BIGINT}
   </select>
   <select id="select" parameterType="com.coezal.wallet.api.bean.FetchCash" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
-    from fetch_cash where 1 = 1 
+    from fetch_cash where 1 = 1
     <if test="code != null">
-       and code = #{code,jdbcType=BIGINT}
+      and code = #{code,jdbcType=BIGINT}
     </if>
     <if test="server != null">
-       and server = #{server,jdbcType=VARCHAR}
+      and server = #{server,jdbcType=VARCHAR}
     </if>
     <if test="userSign != null">
-       and user_sign = #{userSign,jdbcType=VARCHAR}
+      and user_sign = #{userSign,jdbcType=VARCHAR}
     </if>
     <if test="checkCode != null">
-       and check_code = #{checkCode,jdbcType=VARCHAR}
+      and check_code = #{checkCode,jdbcType=VARCHAR}
     </if>
     <if test="tokenName != null">
-       and token_name = #{tokenName,jdbcType=VARCHAR}
+      and token_name = #{tokenName,jdbcType=VARCHAR}
     </if>
     <if test="wallet != null">
-       and wallet = #{wallet,jdbcType=VARCHAR}
+      and wallet = #{wallet,jdbcType=VARCHAR}
     </if>
     <if test="money != null">
-       and money = #{money,jdbcType=REAL}
+      and money = #{money,jdbcType=REAL}
     </if>
     <if test="time != null">
-       and time = #{time,jdbcType=TIMESTAMP}
+      and time = #{time,jdbcType=TIMESTAMP}
     </if>
     <if test="md5chk != null">
-       and md5chk = #{md5chk,jdbcType=VARCHAR}
+      and md5chk = #{md5chk,jdbcType=VARCHAR}
+    </if>
+    <if test="transactionHash != null">
+      and transaction_hash = #{transactionHash,jdbcType=VARCHAR}
+    </if>
+    <if test="transactionSuccess != null">
+      and transaction_success = #{transactionSuccess,jdbcType=TINYINT}
     </if>
   </select>
   <select id="selectOne" parameterType="com.coezal.wallet.api.bean.FetchCash" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
-    from fetch_cash where 1 = 1 
+    from fetch_cash where 1 = 1
     <if test="code != null">
-       and code = #{code,jdbcType=BIGINT}
+      and code = #{code,jdbcType=BIGINT}
     </if>
     <if test="server != null">
-       and server = #{server,jdbcType=VARCHAR}
+      and server = #{server,jdbcType=VARCHAR}
     </if>
     <if test="userSign != null">
-       and user_sign = #{userSign,jdbcType=VARCHAR}
+      and user_sign = #{userSign,jdbcType=VARCHAR}
     </if>
     <if test="checkCode != null">
-       and check_code = #{checkCode,jdbcType=VARCHAR}
+      and check_code = #{checkCode,jdbcType=VARCHAR}
     </if>
     <if test="tokenName != null">
-       and token_name = #{tokenName,jdbcType=VARCHAR}
+      and token_name = #{tokenName,jdbcType=VARCHAR}
     </if>
     <if test="wallet != null">
-       and wallet = #{wallet,jdbcType=VARCHAR}
+      and wallet = #{wallet,jdbcType=VARCHAR}
     </if>
     <if test="money != null">
-       and money = #{money,jdbcType=REAL}
+      and money = #{money,jdbcType=REAL}
     </if>
     <if test="time != null">
-       and time = #{time,jdbcType=TIMESTAMP}
+      and time = #{time,jdbcType=TIMESTAMP}
     </if>
     <if test="md5chk != null">
-       and md5chk = #{md5chk,jdbcType=VARCHAR}
+      and md5chk = #{md5chk,jdbcType=VARCHAR}
     </if>
-     limit 1 
+    <if test="transactionHash != null">
+      and transaction_hash = #{transactionHash,jdbcType=VARCHAR}
+    </if>
+    <if test="transactionSuccess != null">
+      and transaction_success = #{transactionSuccess,jdbcType=TINYINT}
+    </if>
+    limit 1
   </select>
 </mapper>
