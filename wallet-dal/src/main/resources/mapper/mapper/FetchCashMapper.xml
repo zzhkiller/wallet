@@ -3,13 +3,13 @@
 <mapper namespace="com.coezal.wallet.dal.dao.FetchCashMapper">
     <resultMap id="BaseResultMap" type="com.coezal.wallet.api.bean.FetchCash">
         <id column="id" jdbcType="BIGINT" property="id" />
-        <result column="code" jdbcType="BIGINT" property="code" />
+        <result column="code" jdbcType="VARCHAR" property="code" />
         <result column="server" jdbcType="VARCHAR" property="server" />
         <result column="user_sign" jdbcType="VARCHAR" property="userSign" />
         <result column="check_code" jdbcType="VARCHAR" property="checkCode" />
         <result column="token_name" jdbcType="VARCHAR" property="tokenName" />
         <result column="wallet" jdbcType="VARCHAR" property="wallet" />
-        <result column="money" jdbcType="REAL" property="money" />
+        <result column="money" jdbcType="VARCHAR" property="money" />
         <result column="time" jdbcType="TIMESTAMP" property="time" />
         <result column="md5chk" jdbcType="VARCHAR" property="md5chk" />
         <result column="transaction_hash" jdbcType="VARCHAR" property="transactionHash" />
@@ -65,7 +65,7 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="code != null">
-                #{code,jdbcType=BIGINT},
+                #{code,jdbcType=VARCHAR},
             </if>
             <if test="server != null">
                 #{server,jdbcType=VARCHAR},
@@ -83,7 +83,7 @@
                 #{wallet,jdbcType=VARCHAR},
             </if>
             <if test="money != null">
-                #{money,jdbcType=REAL},
+                #{money,jdbcType=VARCHAR},
             </if>
             <if test="time != null">
                 #{time,jdbcType=TIMESTAMP},
@@ -106,7 +106,7 @@
         update fetch_cash
         <set>
             <if test="code != null">
-                code = #{code,jdbcType=BIGINT},
+                code = #{code,jdbcType=VARCHAR},
             </if>
             <if test="server != null">
                 server = #{server,jdbcType=VARCHAR},
@@ -124,7 +124,7 @@
                 wallet = #{wallet,jdbcType=VARCHAR},
             </if>
             <if test="money != null">
-                money = #{money,jdbcType=REAL},
+                money = #{money,jdbcType=VARCHAR},
             </if>
             <if test="time != null">
                 time = #{time,jdbcType=TIMESTAMP},
@@ -159,7 +159,7 @@
         <include refid="Base_Column_List" />
         from fetch_cash where 1 = 1
         <if test="code != null">
-            and code = #{code,jdbcType=BIGINT}
+            and code = #{code,jdbcType=VARCHAR}
         </if>
         <if test="server != null">
             and server = #{server,jdbcType=VARCHAR}
@@ -177,7 +177,7 @@
             and wallet = #{wallet,jdbcType=VARCHAR}
         </if>
         <if test="money != null">
-            and money = #{money,jdbcType=REAL}
+            and money = #{money,jdbcType=VARCHAR}
         </if>
         <if test="time != null">
             and time = #{time,jdbcType=TIMESTAMP}
@@ -200,7 +200,7 @@
         <include refid="Base_Column_List" />
         from fetch_cash where 1 = 1
         <if test="code != null">
-            and code = #{code,jdbcType=BIGINT}
+            and code = #{code,jdbcType=VARCHAR}
         </if>
         <if test="server != null">
             and server = #{server,jdbcType=VARCHAR}
@@ -218,7 +218,7 @@
             and wallet = #{wallet,jdbcType=VARCHAR}
         </if>
         <if test="money != null">
-            and money = #{money,jdbcType=REAL}
+            and money = #{money,jdbcType=VARCHAR}
         </if>
         <if test="time != null">
             and time = #{time,jdbcType=TIMESTAMP}
