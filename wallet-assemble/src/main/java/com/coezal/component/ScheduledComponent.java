@@ -146,10 +146,10 @@ public class ScheduledComponent {
 
 
   /**
-   * 每隔15分钟处理用户提现
+   * 每隔20分钟处理用户提现
    */
   @Async
-  @Scheduled(fixedDelay = 200000)
+  @Scheduled(fixedDelay = 1200000)
   public void processUserFetchCash() {
     List<FetchCash> cashList = fetchCashService.getAllNoticeApiNotSuccessFetchCash();
     if (cashList != null && cashList.size() > 0) {

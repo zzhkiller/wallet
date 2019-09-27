@@ -68,5 +68,6 @@ public class PasswordGenerator {
 
     String decrypt = AESUtils.decrypt(encryptMnemonic, aesPwd);
     System.out.println("decrypt===" + decrypt);
+
   }
 }
