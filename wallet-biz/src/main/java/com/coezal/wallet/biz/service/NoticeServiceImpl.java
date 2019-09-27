@@ -65,8 +65,8 @@ public class NoticeServiceImpl extends ThirdApiInvoker implements NoticeService 
         ApiReq apiReq = new ApiReq();
         try {
             apiReq.setDatastr(RSACoder.encryptAPIParams(jsonObj));
-            System.out.println("rechargeNotice==="+jsonObj);
-            System.out.println("rechargeNotice==="+apiReq.getDatastr());
+            logger.info("checkFetchCash------"+jsonObj);
+            logger.info("checkFetchCash==="+apiReq.getDatastr());
             BaseResponse baseResponse = doHttpPost(domain + "/api/pay/getcheck", BaseResponse.class, null, apiReq.getDatastr());
             if (baseResponse.getCode() == 0) {
                 return Boolean.TRUE;

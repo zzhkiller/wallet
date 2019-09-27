@@ -184,7 +184,7 @@ public class ScheduledComponent {
             } else {
               nonce = nonce.add(new BigInteger("1"));
             }
-            BigInteger amount = WalletUtils.getFetchMoney(cash.getMoney() + "", token.getTokenDecimals());
+            BigInteger amount = WalletUtils.getFetchMoney(cash.getMoney(), token.getTokenDecimals());
             String hash = transaction.doFetchCashTransaction(pwd, dispatchAddress, nonce, cash.getWallet(), amount, token.getTokenContractAddress());
             if (hash != null) {
               while (true) {

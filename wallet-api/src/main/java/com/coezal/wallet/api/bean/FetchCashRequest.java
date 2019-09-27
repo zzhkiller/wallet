@@ -8,11 +8,11 @@ public class FetchCashRequest {
     private String server;
     private String usersign;
     private String checkcode;
-    private Long id; //提现编号
+    private String id; //提现编号
     private String tokenname;
     private String wallet;// 钱包地址
-    private Float money;// 金额
-    private Long time;//提现时间
+    private String money;// 金额
+    private String time;//提现时间
     private String md5chk;
 
     public String getServer() {
@@ -40,14 +40,6 @@ public class FetchCashRequest {
     }
 
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getTokenname() {
         return tokenname;
     }
@@ -64,19 +56,27 @@ public class FetchCashRequest {
         this.wallet = wallet;
     }
 
-    public Float getMoney() {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getMoney() {
         return money;
     }
 
-    public void setMoney(Float money) {
+    public void setMoney(String money) {
         this.money = money;
     }
 
-    public Long getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Long time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

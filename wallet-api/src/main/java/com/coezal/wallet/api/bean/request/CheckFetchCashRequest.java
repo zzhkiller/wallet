@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class CheckFetchCashRequest implements Serializable {
     private String usersign;
     private String checkcode;
-    private Long id;//体现编号
+    private String id;//体现编号
     private String md5chk;
 
     public String getUsersign() {
@@ -27,11 +27,11 @@ public class CheckFetchCashRequest implements Serializable {
         this.checkcode = checkcode;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

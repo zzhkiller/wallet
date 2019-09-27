@@ -11,7 +11,7 @@ public class FetchCash {
     private Long id;
 
     /**api 体现请求的id 唯一 不为空*/
-    private Long code;
+    private String code;
 
     /**测试还是正式环境区别*/
     private String server;
@@ -29,7 +29,7 @@ public class FetchCash {
     private String wallet;
 
     /**提现数量，不为空*/
-    private Float money;
+    private String money;
 
     /**提现时间*/
     private Date time;
@@ -54,12 +54,20 @@ public class FetchCash {
         this.id = id;
     }
 
-    public Long getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(Long code) {
+    public void setCode(String code) {
         this.code = code;
+    }
+
+    public String getMoney() {
+        return money;
+    }
+
+    public void setMoney(String money) {
+        this.money = money;
     }
 
     public String getServer() {
@@ -100,14 +108,6 @@ public class FetchCash {
 
     public void setWallet(String wallet) {
         this.wallet = wallet;
-    }
-
-    public Float getMoney() {
-        return money;
-    }
-
-    public void setMoney(Float money) {
-        this.money = money;
     }
 
     public Date getTime() {

@@ -92,7 +92,8 @@ public class FetchCashServiceImpl extends BaseService implements FetchCashServic
     cash.setMoney(fetchCashRequest.getMoney());
     cash.setTokenName(fetchCashRequest.getTokenname());
     cash.setServer(fetchCashRequest.getServer());
-    cash.setTime(new Date(fetchCashRequest.getTime()));
+    cash.setWallet(fetchCashRequest.getWallet());
+    cash.setTime(new Date(Long.parseLong(fetchCashRequest.getTime())));
     List<FetchCash> result = fetchCashMapper.select(cash);
     if (result != null && result.size() > 0) { //提现请求已经存在
       logger.info("insert fetch cash exit===" + cash.toString());
@@ -125,9 +126,14 @@ public class FetchCashServiceImpl extends BaseService implements FetchCashServic
 
   private void checkFetchCashRequest(FetchCashRequest fetchCashRequest) {
     StringBuilder sb = new StringBuilder();
+    sb.append(fetchCashRequest.getServer());
     sb.append(fetchCashRequest.getUsersign());
     sb.append(fetchCashRequest.getCheckcode());
     sb.append(fetchCashRequest.getId());
+    sb.append(fetchCashRequest.getTokenname());
+    sb.append(fetchCashRequest.getWallet());
+    sb.append(fetchCashRequest.getMoney());
+    sb.append(fetchCashRequest.getTime());
     sb.append(salt);
     if (!Objects.equals(fetchCashRequest.getMd5chk(), Md5Util.MD5(sb.toString()))) {
       throw new BizException(MD5_CHECK_ERROR);
