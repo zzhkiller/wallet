@@ -62,7 +62,7 @@ public class PasswordGenerator {
 
   public static void main(String[] args) {
     String aesPwd = getPwd();
-    String encryptMnemonic = AESUtils.encrypt("0xd9795Ac75229d4bE73cF817D0d65eC03E378849B", aesPwd);
+    String encryptMnemonic = AESUtils.encrypt("8444B5500B7BAFBB604AB9C0B101002428BD4C9AEA7AEB79F8DD704E6E372119", aesPwd);
     System.out.println("aesPwd===" + aesPwd);
     System.out.println("encryptMnemonic===" + encryptMnemonic);
 

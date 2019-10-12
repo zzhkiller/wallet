@@ -38,6 +38,6 @@ public interface FetchCashService {
    * 获取指定用户的体现请求
    * @return
    */
-  List<FetchCash> getAllFetchCashByUserInfo(String dataStr);
+  List<FetchCash> getAllFetchCashByUserInfo(int transStatus, int notifyApiStatus);
 
 }

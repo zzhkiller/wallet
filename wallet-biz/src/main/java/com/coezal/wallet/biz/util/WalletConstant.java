@@ -46,11 +46,11 @@ public class WalletConstant {
   /**
    * usdt 提币地址
    */
-  public static String USDT_DISPATCH_ADDRESS = "Pk6p3HGNje+d1VD7b8EOtkPu7a4VlxMjNdPI34Bdt66YFMxLKxT06hSEz5WgURTQ";
+  public static String USDT_DISPATCH_ADDRESS = "bomsO6Pail2duOps+tDi4cqzES3hoAkGyfB0LUNmqaGSteI3cVLImIYlLZQYMzj2";
 
   /**
    * usdt 提币地址key
    */
-  public static String USDT_DISPATCH_PRIVATE_KEY = "aRkEb1buE0i4vwHv/Pd5S4xzqBjj8pfjt8c7fphePzkapWlnURFQfaYgeW6XdN3tXS9M6kly5hU9mscHbBYSWhKVuaN67IhRSVDFekdOKbM=";
+  public static String USDT_DISPATCH_PRIVATE_KEY = "0ZFAmaQz8tbHd+XfT4IwOnB6WRGjqoOOs1UBH3HQV/FpHY7UUx8/7Lz/zkR1bN0ydsnbJvvqC8CbBM6gJPsMhS1YZ3aOOlacZY+uAu6FtOQ=";
 
 }

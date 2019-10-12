@@ -152,15 +152,17 @@ public class ScheduledComponent {
   @Scheduled(fixedDelay = 1200000)
   public void processUserFetchCash() {
     List<FetchCash> cashList = fetchCashService.getAllNoticeApiNotSuccessFetchCash();
+    logger.info("processUserFetchCash size===" + cashList.size());
     if (cashList != null && cashList.size() > 0) {
       WalletTransaction transaction = new WalletTransaction(rpcUrl);
       String pwd = PasswordGenerator.getPwd();
       String dispatchAddress = AESUtils.decrypt(USDT_DISPATCH_ADDRESS, pwd);
       BigInteger nonce = null;
       for (FetchCash cash : cashList) {
+        logger.info("processUserFetchCash dispatchAddress===" + dispatchAddress + "====cash===" + cash.toString());
         if (cash.getServer() == "test") { //直接通知用户体现成功
           logger.info("processUserFetchCash test FetchCash===" + cash.getTokenName());
-          boolean success = noticeApiFetchCash(cash, 1);
+          boolean success = noticeApiFetchCash(cash, "1");
           byte sByte = success ? (byte) 1 : (byte) 0;
           cash.setNoticeApiSuccess(sByte);
           fetchCashService.updateFetchCash(cash);
@@ -173,11 +175,11 @@ public class ScheduledComponent {
         }
         try {
           if (cash.getTransactionSuccess() == (byte) 1) {//提币成功了，没通知成功,重新通知
-            boolean success = noticeApiFetchCash(cash, 1);
+            boolean success = noticeApiFetchCash(cash, "1");
             byte sByte = success ? (byte) 1 : (byte) 0;
             cash.setNoticeApiSuccess(sByte);
             fetchCashService.updateFetchCash(cash);
-            logger.info("checkFetchCashRequest user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "== tran success notice failed");
+            logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "== tran success notice failed");
           } else {
             if (nonce == null) {
               nonce = transaction.getNonce(dispatchAddress);
@@ -186,9 +188,13 @@ public class ScheduledComponent {
             }
             BigInteger amount = WalletUtils.getFetchMoney(cash.getMoney(), token.getTokenDecimals());
             String hash = transaction.doFetchCashTransaction(pwd, dispatchAddress, nonce, cash.getWallet(), amount, token.getTokenContractAddress());
+            logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "====nonce==="+nonce+"====money=="+cash.getMoney()+"==== hash==="+hash);
+
             if (hash != null) {
               while (true) {
                 Optional<TransactionReceipt> receiptOptional = transaction.getTransactionReceipt(hash);
+                logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "=money=="+cash.getMoney()+"==== hash==="+hash+"=====receipt==="+receiptOptional.isPresent());
+
                 if (receiptOptional.isPresent()) {
                   TransactionReceipt receipt = receiptOptional.get();
                   logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " status==" + receipt.getStatus());
@@ -198,18 +204,21 @@ public class ScheduledComponent {
                   logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " blockHash==" + receipt.getBlockHash());
 
                   if (receipt.isStatusOK()) {//提币成功
+                    cash.setTransactionHash(hash);
                     cash.setTransactionSuccess((byte) 1);
                     fetchCashService.updateFetchCash(cash);
-                    boolean success = noticeApiFetchCash(cash, 1);
+                    boolean success = noticeApiFetchCash(cash, "1");
                     byte sByte = success ? (byte) 1 : (byte) 0;
                     cash.setNoticeApiSuccess(sByte);
                     fetchCashService.updateFetchCash(cash);
                     logger.info("checkFetchCashRequest user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " notice api success=" + sByte);
                   } else {
-                    noticeApiFetchCash(cash, -1);
+                    noticeApiFetchCash(cash, "-1");
+                    logger.info("checkFetchCashRequest user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " notice api error=" );
                   }
                   break;
                 } else {
+                  logger.info("checkFetchCashRequest user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + "no result  thread 10s");
                   Thread.sleep(10000);
                 }
               }
@@ -229,7 +238,7 @@ public class ScheduledComponent {
    * @param status 提现状态，1，成功 -1 失败
    * @return
    */
-  private boolean noticeApiFetchCash(FetchCash cash, int status){
+  private boolean noticeApiFetchCash(FetchCash cash, String status){
     FetchCashResultRequest resultRequest = new FetchCashResultRequest();
     resultRequest.setUsersign(cash.getUserSign());
     resultRequest.setCheckcode(cash.getCheckCode());

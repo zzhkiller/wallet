@@ -145,7 +145,7 @@ public class WalletServiceImpl extends BaseService implements WalletService {
   public List<WalletBean> getAllUserAddresses() {
     List<WalletBean> beanList = walletMapper.selectAllUsedAddress();
 
-//    asyncTask.collectUsdtTokenToAddress(beanList);
+    asyncTask.collectUsdtToCollectAddress(beanList);
     return beanList;
   }
 

@@ -76,16 +76,17 @@ public class CztApplicationListener implements ApplicationListener<ContextRefres
   }
 
   private void initToken() {
-    List<Token> tokenList = tokenMapper.select(null);
+    Token token = new Token();
+    List<Token> tokenList = tokenMapper.select(token);
     if (tokenList == null || tokenList.size() == 0) {
-      logger.info("init token", "init token");
+      logger.info("init token no token insert token===");
       Token usdtToken = new Token("0xdac17f958d2ee523a2206206994597c13d831ec7", 6, "Tether USD", "USDT", "");
       tokenMapper.insert(usdtToken);
       //存储CZT token
       Token cztToken = new Token("0x99a3721266997cd8cb48afe11b3d43b4eb70d281", 18, "coezal", "czt", "");
       tokenMapper.insert(cztToken);
     } else {
-      logger.info("init token", "has token" + tokenList.size());
+      logger.info("init token has token" + tokenList.size());
     }
   }
 }

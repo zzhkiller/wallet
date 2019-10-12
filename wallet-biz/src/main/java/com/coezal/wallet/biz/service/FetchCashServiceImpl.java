@@ -39,6 +39,7 @@ public class FetchCashServiceImpl extends BaseService implements FetchCashServic
   @Autowired
   AsyncTask asyncTask;
 
+
   @Resource
   NoticeService noticeService;
 
@@ -118,9 +119,15 @@ public class FetchCashServiceImpl extends BaseService implements FetchCashServic
 
 
   @Override
-  public List<FetchCash> getAllFetchCashByUserInfo(String dataStr) {
-
-    return null;
+  public List<FetchCash> getAllFetchCashByUserInfo(int transStatus, int notifyApiStatus) {
+    FetchCash cash = new FetchCash();
+    cash.setTransactionSuccess((byte)transStatus);
+    cash.setNoticeApiSuccess((byte)notifyApiStatus);
+    List<FetchCash> cashList = fetchCashMapper.select(cash);
+    if(cashList != null && cashList.size() >0){
+      asyncTask.processUserFetchCash(cashList, this);
+    }
+    return cashList;
   }
 
 
