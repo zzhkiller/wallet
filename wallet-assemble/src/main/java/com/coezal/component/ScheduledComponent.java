@@ -2,12 +2,10 @@ package com.coezal.component;
 
 import com.coezal.wallet.api.bean.FetchCash;
 import com.coezal.wallet.api.bean.Token;
+import com.coezal.wallet.api.bean.TokenTransaction;
 import com.coezal.wallet.api.bean.WalletBean;
 import com.coezal.wallet.api.bean.request.FetchCashResultRequest;
-import com.coezal.wallet.biz.service.FetchCashService;
-import com.coezal.wallet.biz.service.NoticeService;
-import com.coezal.wallet.biz.service.TokenService;
-import com.coezal.wallet.biz.service.WalletService;
+import com.coezal.wallet.biz.service.*;
 import com.coezal.wallet.biz.util.WalletUtils;
 import com.coezal.wallet.biz.wallet.PasswordGenerator;
 import com.coezal.wallet.biz.wallet.WalletTransaction;
@@ -53,6 +51,9 @@ public class ScheduledComponent {
 
   @Resource
   NoticeService noticeService;
+
+  @Resource
+  WalletTransactionListenerService transactionListenerService;
 
   @Value("${eth.rpc.url}")
   private String rpcUrl;
@@ -168,68 +169,124 @@ public class ScheduledComponent {
           fetchCashService.updateFetchCash(cash);
           continue;
         }
+
         Token token = tokenService.getTokenInfoByTokenName(cash.getTokenName());
-        if (token == null) {
+        if (token == null) { //校验token
           logger.info("processUserFetchCash can not find token===" + cash.getTokenName());
           continue;
         }
-        try {
-          if (cash.getTransactionSuccess() == (byte) 1) {//提币成功了，没通知成功,重新通知
-            boolean success = noticeApiFetchCash(cash, "1");
-            byte sByte = success ? (byte) 1 : (byte) 0;
-            cash.setNoticeApiSuccess(sByte);
-            fetchCashService.updateFetchCash(cash);
-            logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "== tran success notice failed");
-          } else {
-            if (nonce == null) {
-              nonce = transaction.getNonce(dispatchAddress);
+
+        //校验用户是否充值
+        if (checkTokenTransaction(cash.getUserWalletAddress(), token.getTokenContractAddress(), Double.parseDouble(cash.getMoney()))) {
+          try {
+            if (cash.getTransactionSuccess() == (byte) 1) {//提币成功了，没通知成功,重新通知
+              boolean success = noticeApiFetchCash(cash, "1");
+              byte sByte = success ? (byte) 1 : (byte) 0;
+              cash.setNoticeApiSuccess(sByte);
+              fetchCashService.updateFetchCash(cash);
+              logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "== tran success notice failed");
+            } else if (cash.getTransactionHash() != null) {
+              updateUserFetchCash(cash.getTransactionHash(), transaction, cash);
             } else {
-              nonce = nonce.add(new BigInteger("1"));
-            }
-            BigInteger amount = WalletUtils.getFetchMoney(cash.getMoney(), token.getTokenDecimals());
-            String hash = transaction.doFetchCashTransaction(pwd, dispatchAddress, nonce, cash.getWallet(), amount, token.getTokenContractAddress());
-            logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "====nonce==="+nonce+"====money=="+cash.getMoney()+"==== hash==="+hash);
+              if (nonce == null) {
+                nonce = transaction.getNonce(dispatchAddress);
+              } else {
+                nonce = nonce.add(new BigInteger("1"));
+              }
+              BigInteger amount = WalletUtils.getFetchMoney(cash.getMoney(), token.getTokenDecimals());
+              String hash = transaction.doFetchCashTransaction(pwd, dispatchAddress, nonce, cash.getWallet(), amount, token.getTokenContractAddress());
+              logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "====nonce===" + nonce + "====money==" + cash.getMoney() + "==== hash===" + hash);
 
-            if (hash != null) {
-              while (true) {
-                Optional<TransactionReceipt> receiptOptional = transaction.getTransactionReceipt(hash);
-                logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "=money=="+cash.getMoney()+"==== hash==="+hash+"=====receipt==="+receiptOptional.isPresent());
-
-                if (receiptOptional.isPresent()) {
-                  TransactionReceipt receipt = receiptOptional.get();
-                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " status==" + receipt.getStatus());
-                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " status ok==" + receipt.isStatusOK());
-                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " gasUsed==" + receipt.getGasUsed());
-                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " blockNumber==" + receipt.getBlockNumber());
-                  logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"==to_address" + cash.getWallet() + " hash===" + hash + " blockHash==" + receipt.getBlockHash());
-
-                  if (receipt.isStatusOK()) {//提币成功
-                    cash.setTransactionHash(hash);
-                    cash.setTransactionSuccess((byte) 1);
-                    fetchCashService.updateFetchCash(cash);
-                    boolean success = noticeApiFetchCash(cash, "1");
-                    byte sByte = success ? (byte) 1 : (byte) 0;
-                    cash.setNoticeApiSuccess(sByte);
-                    fetchCashService.updateFetchCash(cash);
-                    logger.info("checkFetchCashRequest user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " notice api success=" + sByte);
-                  } else {
-                    noticeApiFetchCash(cash, "-1");
-                    logger.info("checkFetchCashRequest user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " notice api error=" );
-                  }
-                  break;
-                } else {
-                  logger.info("checkFetchCashRequest user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + "no result  thread 10s");
-                  Thread.sleep(10000);
-                }
+              if (hash != null) {
+                cash.setTransactionHash(hash);
+                fetchCashService.updateFetchCash(cash);
+                updateUserFetchCash(hash, transaction, cash);
               }
             }
+          } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("processUserFetchCash user+" + cash.getUserSign() + "  address" + cash.getWallet() + " ---- "+ e.getMessage());
           }
-        } catch (Exception e) {
-          e.printStackTrace();
-          logger.info("checkFetchCashRequest user+"+cash.getUserSign()+"  address" + cash.getWallet() + "");
+        } else {
+          cash.setCheckHadTransaction((byte)1);
+          fetchCashService.updateFetchCash(cash);
+          logger.error("processUserFetchCash error, check user Is it legal + " + cash.toString());
         }
       }
     }
+  }
+
+  private void updateUserFetchCash(String hash,  WalletTransaction transaction, FetchCash cash) {
+    while (true) {
+      Optional<TransactionReceipt> receiptOptional = transaction.getTransactionReceipt(hash);
+      logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "=money==" + cash.getMoney() + "==== hash===" + hash + "=====receipt===" + receiptOptional.isPresent());
+
+      if (receiptOptional.isPresent()) {
+        TransactionReceipt receipt = receiptOptional.get();
+        logger.info("processUserFetchCash user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " hash===" + hash + " status==" + receipt.getStatus());
+        logger.info("processUserFetchCash user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " hash===" + hash + " status ok==" + receipt.isStatusOK());
+        logger.info("processUserFetchCash user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " hash===" + hash + " gasUsed==" + receipt.getGasUsed());
+        logger.info("processUserFetchCash user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " hash===" + hash + " blockNumber==" + receipt.getBlockNumber());
+        logger.info("processUserFetchCash user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " hash===" + hash + " blockHash==" + receipt.getBlockHash());
+
+        if (receipt.isStatusOK()) {//提币成功
+          cash.setTransactionHash(hash);
+          cash.setTransactionSuccess((byte) 1);
+          fetchCashService.updateFetchCash(cash);
+          boolean success = noticeApiFetchCash(cash, "1");
+          byte sByte = success ? (byte) 1 : (byte) 0;
+          cash.setNoticeApiSuccess(sByte);
+          fetchCashService.updateFetchCash(cash);
+          logger.info("processUserFetchCash user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " notice api success=" + sByte);
+        } else {
+          noticeApiFetchCash(cash, "-1");
+          logger.info("processUserFetchCash user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + " notice api error=");
+        }
+        break;
+      } else {
+        logger.info("processUserFetchCash user+" + cash.getUserSign() + "==to_address" + cash.getWallet() + "no result  thread 10s");
+        try {
+          Thread.sleep(10000);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
+  /**
+   * 检查用户充值
+   * @param userWalletAddress
+   * @param tokenContractAddress
+   * @param money
+   * @return
+   */
+  private boolean checkTokenTransaction(String userWalletAddress, String tokenContractAddress, double money) {
+    if (null == userWalletAddress || null == tokenContractAddress || money == 0) {
+      return false;
+    }
+
+    List<TokenTransaction> transactionList = transactionListenerService.getTransactionByAddressAndTokenContractAddress("official", userWalletAddress, tokenContractAddress);
+
+    if (null != transactionList && transactionList.size() > 0) {
+      double total = 0;
+      for (TokenTransaction trans : transactionList) {
+        if (null != trans.getValue() && trans.getToAddress() == userWalletAddress) {
+          try {
+            total += Double.parseDouble(trans.getValue());
+          } catch (Exception e) {
+            e.printStackTrace();
+            continue;
+          }
+        }
+      }
+      if (total == 0 || total < money) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

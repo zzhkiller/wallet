@@ -32,10 +32,13 @@ public class FetchCash {
     private String money;
 
     /**提现时间*/
-    private Date time;
+    private String time;
 
     /**md5校验，不为空*/
     private String md5chk;
+
+    /**用户钱包地址*/
+    private String userWalletAddress;
 
     /**提现hash，可为空，但是唯一*/
     private String transactionHash;
@@ -45,6 +48,9 @@ public class FetchCash {
 
     /**通知API体现成功是否成功 0不成功，1成功*/
     private byte noticeApiSuccess;
+
+    /**是否曾经有过转币，0有过，1没有*/
+    private byte checkHadTransaction;
 
     public Long getId() {
         return id;
@@ -110,11 +116,11 @@ public class FetchCash {
         this.wallet = wallet;
     }
 
-    public Date getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
@@ -150,22 +156,40 @@ public class FetchCash {
         this.noticeApiSuccess = noticeApiSuccess;
     }
 
+    public String getUserWalletAddress() {
+        return userWalletAddress;
+    }
+
+    public void setUserWalletAddress(String userWalletAddress) {
+        this.userWalletAddress = userWalletAddress;
+    }
+
+    public byte getCheckHadTransaction() {
+        return checkHadTransaction;
+    }
+
+    public void setCheckHadTransaction(byte checkHadTransaction) {
+        this.checkHadTransaction = checkHadTransaction;
+    }
+
     @Override
     public String toString() {
         return "FetchCash{" +
                 "id=" + id +
-                ", code=" + code +
+                ", code='" + code + '\'' +
                 ", server='" + server + '\'' +
                 ", userSign='" + userSign + '\'' +
                 ", checkCode='" + checkCode + '\'' +
                 ", tokenName='" + tokenName + '\'' +
                 ", wallet='" + wallet + '\'' +
-                ", money=" + money +
-                ", time=" + time +
+                ", money='" + money + '\'' +
+                ", time='" + time + '\'' +
                 ", md5chk='" + md5chk + '\'' +
+                ", userWalletAddress='" + userWalletAddress + '\'' +
                 ", transactionHash='" + transactionHash + '\'' +
                 ", transactionSuccess=" + transactionSuccess +
                 ", noticeApiSuccess=" + noticeApiSuccess +
+                ", checkHadTransaction=" + checkHadTransaction +
                 '}';
     }
 }

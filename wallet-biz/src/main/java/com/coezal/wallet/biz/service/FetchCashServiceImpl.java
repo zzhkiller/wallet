@@ -3,6 +3,7 @@ package com.coezal.wallet.biz.service;
 import com.coezal.wallet.api.bean.FetchCash;
 import com.coezal.wallet.api.bean.FetchCashRequest;
 import com.coezal.wallet.api.bean.Token;
+import com.coezal.wallet.api.bean.WalletBean;
 import com.coezal.wallet.api.bean.request.CheckFetchCashRequest;
 import com.coezal.wallet.api.excetion.BizException;
 import com.coezal.wallet.biz.component.AsyncTask;
@@ -82,9 +83,15 @@ public class FetchCashServiceImpl extends BaseService implements FetchCashServic
     getToken(fetchCashRequest.getTokenname());
 
     //3、校验用户钱包是否存在
-    getUserWalletBean(fetchCashRequest.getUsersign() + "|" + fetchCashRequest.getCheckcode());
+    WalletBean walletBean = getUserWalletBean(fetchCashRequest.getUsersign() + "|" + fetchCashRequest.getCheckcode());
 
-    //4、校验相同提现请求是否已经存在
+    //4、校验用户钱包是否有过充值记录
+    boolean hasTrans = checkTokenTransaction(walletBean.getAddress(), Double.parseDouble(fetchCashRequest.getMoney()));
+    if (!hasTrans) {
+      throw new BizException(PAY_CHECK_ERROR);
+    }
+
+    //5、校验相同提现请求是否已经存在
     FetchCash cash = new FetchCash();
     cash.setCode(fetchCashRequest.getId());
     cash.setMd5chk(fetchCashRequest.getMd5chk());
@@ -94,7 +101,7 @@ public class FetchCashServiceImpl extends BaseService implements FetchCashServic
     cash.setTokenName(fetchCashRequest.getTokenname());
     cash.setServer(fetchCashRequest.getServer());
     cash.setWallet(fetchCashRequest.getWallet());
-    cash.setTime(new Date(Long.parseLong(fetchCashRequest.getTime())));
+    cash.setTime(fetchCashRequest.getTime());
     List<FetchCash> result = fetchCashMapper.select(cash);
     if (result != null && result.size() > 0) { //提现请求已经存在
       logger.info("insert fetch cash exit===" + cash.toString());
@@ -124,9 +131,9 @@ public class FetchCashServiceImpl extends BaseService implements FetchCashServic
     cash.setTransactionSuccess((byte)transStatus);
     cash.setNoticeApiSuccess((byte)notifyApiStatus);
     List<FetchCash> cashList = fetchCashMapper.select(cash);
-    if(cashList != null && cashList.size() >0){
-      asyncTask.processUserFetchCash(cashList, this);
-    }
+//    if(cashList != null && cashList.size() >0){
+//      asyncTask.processUserFetchCash(cashList, this);
+//    }
     return cashList;
   }
 

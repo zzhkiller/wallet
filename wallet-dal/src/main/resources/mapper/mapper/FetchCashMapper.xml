@@ -10,15 +10,16 @@
         <result column="token_name" jdbcType="VARCHAR" property="tokenName" />
         <result column="wallet" jdbcType="VARCHAR" property="wallet" />
         <result column="money" jdbcType="VARCHAR" property="money" />
-        <result column="time" jdbcType="TIMESTAMP" property="time" />
+        <result column="time" jdbcType="VARCHAR" property="time" />
         <result column="md5chk" jdbcType="VARCHAR" property="md5chk" />
         <result column="transaction_hash" jdbcType="VARCHAR" property="transactionHash" />
         <result column="transaction_success" jdbcType="TINYINT" property="transactionSuccess" />
         <result column="notice_api_success" jdbcType="TINYINT" property="noticeApiSuccess" />
+        <result column="had_transaction" jdbcType="TINYINT" property="checkHadTransaction" />
     </resultMap>
     <sql id="Base_Column_List">
     id, code, server, user_sign, check_code, token_name, wallet, money, time, md5chk,
-    transaction_hash, transaction_success, notice_api_success
+    transaction_hash, transaction_success, notice_api_success, had_transaction
   </sql>
     <insert id="insert" parameterType="com.coezal.wallet.api.bean.FetchCash">
         <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -62,6 +63,9 @@
             <if test="noticeApiSuccess != null">
                 notice_api_success,
             </if>
+            <if test="checkHadTransaction != null">
+                had_transaction,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="code != null">
@@ -86,7 +90,7 @@
                 #{money,jdbcType=VARCHAR},
             </if>
             <if test="time != null">
-                #{time,jdbcType=TIMESTAMP},
+                #{time,jdbcType=VARCHAR},
             </if>
             <if test="md5chk != null">
                 #{md5chk,jdbcType=VARCHAR},
@@ -99,6 +103,9 @@
             </if>
             <if test="noticeApiSuccess != null">
                 #{noticeApiSuccess,jdbcType=TINYINT},
+            </if>
+            <if test="checkHadTransaction != null">
+                #{checkHadTransaction,jdbcType=TINYINT},
             </if>
         </trim>
     </insert>
@@ -127,7 +134,7 @@
                 money = #{money,jdbcType=VARCHAR},
             </if>
             <if test="time != null">
-                time = #{time,jdbcType=TIMESTAMP},
+                time = #{time,jdbcType=VARCHAR},
             </if>
             <if test="md5chk != null">
                 md5chk = #{md5chk,jdbcType=VARCHAR},
@@ -140,6 +147,9 @@
             </if>
             <if test="noticeApiSuccess != null">
                 notice_api_success = #{noticeApiSuccess,jdbcType=TINYINT},
+            </if>
+            <if test="checkHadTransaction != null">
+                had_transaction = #{checkHadTransaction,jdbcType=TINYINT},
             </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
@@ -180,7 +190,7 @@
             and money = #{money,jdbcType=VARCHAR}
         </if>
         <if test="time != null">
-            and time = #{time,jdbcType=TIMESTAMP}
+            and time = #{time,jdbcType=VARCHAR}
         </if>
         <if test="md5chk != null">
             and md5chk = #{md5chk,jdbcType=VARCHAR}
@@ -193,6 +203,9 @@
         </if>
         <if test="noticeApiSuccess != null">
             and notice_api_success = #{noticeApiSuccess,jdbcType=TINYINT}
+        </if>
+        <if test="checkHadTransaction != null">
+            and had_transaction = #{checkHadTransaction,jdbcType=TINYINT}
         </if>
     </select>
     <select id="selectOne" parameterType="com.coezal.wallet.api.bean.FetchCash" resultMap="BaseResultMap">
@@ -221,7 +234,7 @@
             and money = #{money,jdbcType=VARCHAR}
         </if>
         <if test="time != null">
-            and time = #{time,jdbcType=TIMESTAMP}
+            and time = #{time,jdbcType=VARCHAR}
         </if>
         <if test="md5chk != null">
             and md5chk = #{md5chk,jdbcType=VARCHAR}
@@ -234,6 +247,9 @@
         </if>
         <if test="noticeApiSuccess != null">
             and notice_api_success = #{noticeApiSuccess,jdbcType=TINYINT}
+        </if>
+        <if test="checkHadTransaction != null">
+            and had_transaction = #{checkHadTransaction,jdbcType=TINYINT}
         </if>
         limit 1
     </select>

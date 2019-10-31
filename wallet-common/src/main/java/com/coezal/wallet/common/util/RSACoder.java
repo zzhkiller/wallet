@@ -9,6 +9,7 @@ import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -365,59 +366,60 @@ public class RSACoder {
 //    System.out.println("甲方解密后的数据：" + new String(decode2));
 //  }
 
-    public static void main(String[] args) {
-      RechargeRequest request=new RechargeRequest();
-      request.setCheckcode("6");
-      request.setId("6");
-      request.setMoney("6.66");
-      request.setTime("6");
-      request.setTokenname("6");
-      request.setUsersign("6");
-      request.setWallet("6");
-      String str1="666666.666gQ#D63K*QW%U9l@X";
-      request.setMd5chk(Md5Util.MD5(str1));
-      String jsonObj=JsonUtil.encode(request);
-      System.out.println(jsonObj);
-      String privateKeyStr="MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIrzh97MQKMEmANyDX+X1NG7DTszFgMbO6KlfincsifH+29hXROZORQIFQCUVphbng6AdzDh+KTYdgphKXbNWoSrYQupLH+ZccREDnRI/x8VGneCBGTotcyL02SWJxpXpUsD//eNOWgi495mNnmooZ1J0NY3Nk7c0cZ0sSXPR6RbAgMBAAECgYALDgD7SsjBr3XgoExOoGfAH9+XnCLeMGZ4NC5rajGKVLC+VcKv8nrGCzaQizywdmmGwdW5v+CmTMpnXP+Nghz3Xx6vbfKLA93jxPEYayg7LxqvZMpz9MZjf8h8zWugkAQD6/ElFj0KiLJoysdiqN70nCnRojod1ka0ZEiZRIUGwQJBAMC1XYiMfan29qVHV/K3fIUyzI/PMzyQJWTm/SNFd3jvEZopagrvYkxRC7koLoeCvKslcQ2O4gzgpdY+iqPVEBECQQC4llgsghu9v1zZW+kp9gQz5pAp/cYvOS5DTZctVjJzpgZaXmg5a6qgOWPzD8tDm1GW/TQP1yVOMmVO9SHXYFmrAkBWPZQjNMRUGOqeYsQwIf8+2NIFFbQXSWcCtgDZFRB3dX3KIPiM9j5mauq1LQ9No6ttaC8k4ym0m6B7tbdzxDkRAkBh+SKp1REmYIjGsbsLU5IdfhYsw47Kh94fSPKh1KuIqKmck5lcSOJSksOTQmHP64Od0Z0tfzNE0wjkpMWmjHRrAkAUyDj0xyN99WfU099LzNmed4KJyKCspgfwZXE+afgplXrw3TBnM1ZngfZJuvEPOAZ2sMAai3CjESFra5Z1cvCx";
-      String code1 = "";
-      String code2 = "";
-      try {
-        code1 = RSACoder.encryptMultiDataByPrivateKey(jsonObj, Base64.decodeBase64(privateKeyStr));
-        code2 = RSACoder.encryptAPIParams(jsonObj);
-
-//        byte[] key = Base64.decodeBase64("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCK84fezECjBJgDcg1/l9TRuw07MxYDGzuipX4p3LInx/tvYV0TmTkUCBUAlFaYW54OgHcw4fik2HYKYSl2zVqEq2ELqSx/mXHERA50SP8fFRp3ggRk6LXMi9NklicaV6VLA//3jTloIuPeZjZ5qKGdSdDWNzZO3NHGdLElz0ekWwIDAQAB");
+//    public static void main(String[] args) {
+//      RechargeRequest request=new RechargeRequest();
+//      request.setCheckcode("6");
+//      request.setId("6");
+//      request.setMoney("6.66");
+//      request.setTime("6");
+//      request.setTokenname("6");
+//      request.setUsersign("6");
+//      request.setWallet("6");
+//      String str1="666666.666gQ#D63K*QW%U9l@X";
+//      request.setMd5chk(Md5Util.MD5(str1));
+//      String jsonObj=JsonUtil.encode(request);
+//      System.out.println(jsonObj);
+//      String privateKeyStr="MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIrzh97MQKMEmANyDX+X1NG7DTszFgMbO6KlfincsifH+29hXROZORQIFQCUVphbng6AdzDh+KTYdgphKXbNWoSrYQupLH+ZccREDnRI/x8VGneCBGTotcyL02SWJxpXpUsD//eNOWgi495mNnmooZ1J0NY3Nk7c0cZ0sSXPR6RbAgMBAAECgYALDgD7SsjBr3XgoExOoGfAH9+XnCLeMGZ4NC5rajGKVLC+VcKv8nrGCzaQizywdmmGwdW5v+CmTMpnXP+Nghz3Xx6vbfKLA93jxPEYayg7LxqvZMpz9MZjf8h8zWugkAQD6/ElFj0KiLJoysdiqN70nCnRojod1ka0ZEiZRIUGwQJBAMC1XYiMfan29qVHV/K3fIUyzI/PMzyQJWTm/SNFd3jvEZopagrvYkxRC7koLoeCvKslcQ2O4gzgpdY+iqPVEBECQQC4llgsghu9v1zZW+kp9gQz5pAp/cYvOS5DTZctVjJzpgZaXmg5a6qgOWPzD8tDm1GW/TQP1yVOMmVO9SHXYFmrAkBWPZQjNMRUGOqeYsQwIf8+2NIFFbQXSWcCtgDZFRB3dX3KIPiM9j5mauq1LQ9No6ttaC8k4ym0m6B7tbdzxDkRAkBh+SKp1REmYIjGsbsLU5IdfhYsw47Kh94fSPKh1KuIqKmck5lcSOJSksOTQmHP64Od0Z0tfzNE0wjkpMWmjHRrAkAUyDj0xyN99WfU099LzNmed4KJyKCspgfwZXE+afgplXrw3TBnM1ZngfZJuvEPOAZ2sMAai3CjESFra5Z1cvCx";
+//      String code1 = "";
+//      String code2 = "";
+//      try {
+//        code1 = RSACoder.encryptMultiDataByPrivateKey(jsonObj, Base64.decodeBase64(privateKeyStr));
+//        code2 = RSACoder.encryptAPIParams(jsonObj);
 //
-//        String  encrykey = Base64.encodeBase64String(RSACoder.encryptByPublicKey("wallet.coezal.com.io".getBytes(),key));
+////        byte[] key = Base64.decodeBase64("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCK84fezECjBJgDcg1/l9TRuw07MxYDGzuipX4p3LInx/tvYV0TmTkUCBUAlFaYW54OgHcw4fik2HYKYSl2zVqEq2ELqSx/mXHERA50SP8fFRp3ggRk6LXMi9NklicaV6VLA//3jTloIuPeZjZ5qKGdSdDWNzZO3NHGdLElz0ekWwIDAQAB");
+////
+////        String  encrykey = Base64.encodeBase64String(RSACoder.encryptByPublicKey("wallet.coezal.com.io".getBytes(),key));
+////
+////        System.out.println("加密后的数据key ===" + encrykey);
+////
+////        String src = new String(RSACoder.decryptByPrivateKey(Base64.decodeBase64(encrykey),Base64.decodeBase64(privateKeyStr)));
+////        System.out.println("解密后的数据key ===" + src);
+//      } catch (Exception e) {
+//        e.printStackTrace();
+//      }
+//      System.out.println("加密后的数据：" +code1);
+//      System.out.println("加密后的数据2：" +code2);
 //
-//        System.out.println("加密后的数据key ===" + encrykey);
 //
-//        String src = new String(RSACoder.decryptByPrivateKey(Base64.decodeBase64(encrykey),Base64.decodeBase64(privateKeyStr)));
-//        System.out.println("解密后的数据key ===" + src);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-      System.out.println("加密后的数据：" +code1);
-      System.out.println("加密后的数据2：" +code2);
-
-
-
-  }
-
-
-
-
-
-//public static void main(String[] args) {
-//  String privateKeyStr="MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAIrzh97MQKMEmANyDX+X1NG7DTszFgMbO6KlfincsifH+29hXROZORQIFQCUVphbng6AdzDh+KTYdgphKXbNWoSrYQupLH+ZccREDnRI/x8VGneCBGTotcyL02SWJxpXpUsD//eNOWgi495mNnmooZ1J0NY3Nk7c0cZ0sSXPR6RbAgMBAAECgYALDgD7SsjBr3XgoExOoGfAH9+XnCLeMGZ4NC5rajGKVLC+VcKv8nrGCzaQizywdmmGwdW5v+CmTMpnXP+Nghz3Xx6vbfKLA93jxPEYayg7LxqvZMpz9MZjf8h8zWugkAQD6/ElFj0KiLJoysdiqN70nCnRojod1ka0ZEiZRIUGwQJBAMC1XYiMfan29qVHV/K3fIUyzI/PMzyQJWTm/SNFd3jvEZopagrvYkxRC7koLoeCvKslcQ2O4gzgpdY+iqPVEBECQQC4llgsghu9v1zZW+kp9gQz5pAp/cYvOS5DTZctVjJzpgZaXmg5a6qgOWPzD8tDm1GW/TQP1yVOMmVO9SHXYFmrAkBWPZQjNMRUGOqeYsQwIf8+2NIFFbQXSWcCtgDZFRB3dX3KIPiM9j5mauq1LQ9No6ttaC8k4ym0m6B7tbdzxDkRAkBh+SKp1REmYIjGsbsLU5IdfhYsw47Kh94fSPKh1KuIqKmck5lcSOJSksOTQmHP64Od0Z0tfzNE0wjkpMWmjHRrAkAUyDj0xyN99WfU099LzNmed4KJyKCspgfwZXE+afgplXrw3TBnM1ZngfZJuvEPOAZ2sMAai3CjESFra5Z1cvCx";
 //
-//  String str="D4Hxd4wKwF5aMjOeCQXm26XkHecA17F41qtj/Zgub/qzebLOpPemuYv7um3RHi9WzQVayqeZRc2B7gIb6hLuREYwoGitRQuaooRXkiCNHVUGuNkn62RtUHS6S5DV8VRQ0xMKRPhWy3n4/uyxKw5WKl+vlqK9sibnnCgsP8vYCwmCla5sx4iMhv9O4eBw9YyyTTaZPOqEpg4tFiqbPHFw4VVMJq6TjRSDATtWofc8v6L4YQ3f8rgQPrNdFYzNrQlIoKfzIZwob6NpaFtxSNjnou/nP78TxWaXcbAjKavFZpUQT+mTUr8UrLY6jGguRIIzS7R+ziBjRb11Y04ZjcQFfA==";
-//  try {
-//    System.out.println(RSACoder.decryptByPrivateKey1(str,Base64.decodeBase64(privateKeyStr)));
-//
-//  } catch (Exception e) {
-//    e.printStackTrace();
 //  }
-//}
+
+
+
+
+
+public static void main(String[] args) {
+  String publicKey = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANY9WF3bcd8dR3EEiOjcD2J6DWCZMGYGURyK/941zAPuMNrAAI4WTWkhiRbPITQfHl1B/eJRN3QWQtjbZigOOF0CAwEAAQ==";
+  String code2 = "";
+  try {
+    System.out.println("public key === "+publicKey);
+
+    System.out.println(RSACoder.encryptByPublicKey("Hello1231".getBytes(), Base64.decodeBase64(publicKey)));
+
+  } catch (Exception e) {
+    e.printStackTrace();
+  }
+}
 
 
 }

@@ -1,6 +1,7 @@
 package com.coezal.wallet.biz.service;
 
 import com.coezal.wallet.api.bean.TokenTransaction;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * Description
  * copyright generalray4239@gmail.com
  */
+
 public interface WalletTransactionListenerService {
 
   /**
