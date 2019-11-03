@@ -13,13 +13,14 @@
         <result column="time" jdbcType="VARCHAR" property="time" />
         <result column="md5chk" jdbcType="VARCHAR" property="md5chk" />
         <result column="transaction_hash" jdbcType="VARCHAR" property="transactionHash" />
+        <result column="user_wallet" jdbcType="VARCHAR" property="userWalletAddress" />
         <result column="transaction_success" jdbcType="TINYINT" property="transactionSuccess" />
         <result column="notice_api_success" jdbcType="TINYINT" property="noticeApiSuccess" />
         <result column="had_transaction" jdbcType="TINYINT" property="checkHadTransaction" />
     </resultMap>
     <sql id="Base_Column_List">
     id, code, server, user_sign, check_code, token_name, wallet, money, time, md5chk,
-    transaction_hash, transaction_success, notice_api_success, had_transaction
+    transaction_hash, user_wallet, transaction_success, notice_api_success, had_transaction
   </sql>
     <insert id="insert" parameterType="com.coezal.wallet.api.bean.FetchCash">
         <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Long">
@@ -57,6 +58,11 @@
             <if test="transactionHash != null">
                 transaction_hash,
             </if>
+
+            <if test="userWalletAddress != null">
+                transaction_hash,
+            </if>
+
             <if test="transactionSuccess != null">
                 transaction_success,
             </if>
@@ -97,6 +103,9 @@
             </if>
             <if test="transactionHash != null">
                 #{transactionHash,jdbcType=VARCHAR},
+            </if>
+            <if test="userWalletAddress != null">
+                #{userWalletAddress,jdbcType=VARCHAR},
             </if>
             <if test="transactionSuccess != null">
                 #{transactionSuccess,jdbcType=TINYINT},
@@ -142,6 +151,10 @@
             <if test="transactionHash != null">
                 transaction_hash = #{transactionHash,jdbcType=VARCHAR},
             </if>
+            <if test="userWalletAddress != null">
+                user_wallet = #{userWalletAddress,jdbcType=VARCHAR},
+            </if>
+
             <if test="transactionSuccess != null">
                 transaction_success = #{transactionSuccess,jdbcType=TINYINT},
             </if>
@@ -198,6 +211,10 @@
         <if test="transactionHash != null">
             and transaction_hash = #{transactionHash,jdbcType=VARCHAR}
         </if>
+
+        <if test="userWalletAddress != null">
+            and user_wallet = #{userWalletAddress,jdbcType=VARCHAR}
+        </if>
         <if test="transactionSuccess != null">
             and transaction_success = #{transactionSuccess,jdbcType=TINYINT}
         </if>
@@ -241,6 +258,9 @@
         </if>
         <if test="transactionHash != null">
             and transaction_hash = #{transactionHash,jdbcType=VARCHAR}
+        </if>
+        <if test="userWalletAddress != null">
+            and user_wallet = #{userWalletAddress,jdbcType=VARCHAR}
         </if>
         <if test="transactionSuccess != null">
             and transaction_success = #{transactionSuccess,jdbcType=TINYINT}

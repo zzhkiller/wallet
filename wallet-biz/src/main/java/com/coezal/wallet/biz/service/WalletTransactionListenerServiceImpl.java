@@ -4,11 +4,13 @@ import com.alibaba.fastjson.TypeReference;
 import com.coezal.wallet.api.bean.TokenTransaction;
 import com.coezal.wallet.api.vo.base.ETHScanBaseResponse;
 import com.coezal.wallet.biz.util.ThirdApiInvoker;
+import com.coezal.wallet.dal.dao.TokenTransactionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -30,6 +32,11 @@ public class WalletTransactionListenerServiceImpl extends ThirdApiInvoker implem
 
   @Value("${eth.rpc.url}")
   private String rpcUrl;
+
+
+  @Resource
+  TokenTransactionMapper tokenTransactionMapper;
+
 
 
   /**
@@ -68,6 +75,14 @@ public class WalletTransactionListenerServiceImpl extends ThirdApiInvoker implem
       e.printStackTrace();
       return null;
     }
+  }
+
+  @Override
+  public List<TokenTransaction> getLocalTransactionByAddressAndTokenContractAddress(String address, String tokenContractAddress) {
+    TokenTransaction transaction = new TokenTransaction();
+    transaction.setToAddress(address);
+    transaction.setContractAddress(tokenContractAddress);
+    return tokenTransactionMapper.select(transaction);
   }
 
   /**

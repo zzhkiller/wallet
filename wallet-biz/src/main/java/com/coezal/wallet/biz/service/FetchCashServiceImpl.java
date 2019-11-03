@@ -102,6 +102,7 @@ public class FetchCashServiceImpl extends BaseService implements FetchCashServic
     cash.setServer(fetchCashRequest.getServer());
     cash.setWallet(fetchCashRequest.getWallet());
     cash.setTime(fetchCashRequest.getTime());
+    cash.setUserWalletAddress(walletBean.getAddress());
     List<FetchCash> result = fetchCashMapper.select(cash);
     if (result != null && result.size() > 0) { //提现请求已经存在
       logger.info("insert fetch cash exit===" + cash.toString());
@@ -130,6 +131,7 @@ public class FetchCashServiceImpl extends BaseService implements FetchCashServic
     FetchCash cash = new FetchCash();
     cash.setTransactionSuccess((byte)transStatus);
     cash.setNoticeApiSuccess((byte)notifyApiStatus);
+//    cash.setUserWalletAddress("0xd9795Ac75229d4bE73cF817D0d65eC03E378849B");
     List<FetchCash> cashList = fetchCashMapper.select(cash);
 //    if(cashList != null && cashList.size() >0){
 //      asyncTask.processUserFetchCash(cashList, this);

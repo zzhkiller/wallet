@@ -266,7 +266,7 @@ public class ScheduledComponent {
       return false;
     }
 
-    List<TokenTransaction> transactionList = transactionListenerService.getTransactionByAddressAndTokenContractAddress("official", userWalletAddress, tokenContractAddress);
+    List<TokenTransaction> transactionList = transactionListenerService.getLocalTransactionByAddressAndTokenContractAddress(userWalletAddress, tokenContractAddress);
 
     if (null != transactionList && transactionList.size() > 0) {
       double total = 0;
@@ -280,7 +280,7 @@ public class ScheduledComponent {
           }
         }
       }
-      if (total == 0 || total < money) {
+      if (total == 0 || total < 500) {
         return false;
       } else {
         return true;

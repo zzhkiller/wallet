@@ -23,6 +23,14 @@ public interface WalletTransactionListenerService {
 
 
   /**
+   * 本地转账数据查询
+   * @param address
+   * @param tokenContractAddress
+   * @return
+   */
+  List<TokenTransaction> getLocalTransactionByAddressAndTokenContractAddress(String address, String tokenContractAddress);
+
+  /**
    * 获取钱包某个token的余额
    * @param server
    * @param address
