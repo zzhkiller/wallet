@@ -63,6 +63,10 @@
                 transaction_hash,
             </if>
 
+            <if test="userWalletAddress != null">
+                user_wallet,
+            </if>
+
             <if test="transactionSuccess != null">
                 transaction_success,
             </if>
