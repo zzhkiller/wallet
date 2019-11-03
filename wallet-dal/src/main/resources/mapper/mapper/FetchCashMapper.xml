@@ -60,10 +60,6 @@
             </if>
 
             <if test="userWalletAddress != null">
-                transaction_hash,
-            </if>
-
-            <if test="userWalletAddress != null">
                 user_wallet,
             </if>
 
