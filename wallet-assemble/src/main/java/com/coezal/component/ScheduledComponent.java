@@ -185,7 +185,7 @@ public class ScheduledComponent {
               cash.setNoticeApiSuccess(sByte);
               fetchCashService.updateFetchCash(cash);
               logger.info("processUserFetchCash user+" + cash.getUserSign() + " ======address===" + cash.getWallet() + "== tran success notice failed");
-            } else if (cash.getTransactionHash() != null) {
+            } else if (cash.getTransactionHash() != null && cash.getTransactionHash().trim() != "") {
               updateUserFetchCash(cash.getTransactionHash(), transaction, cash);
             } else {
               if (nonce == null) {
@@ -280,13 +280,14 @@ public class ScheduledComponent {
           }
         }
       }
-      if (total == 0 || total < 500) {
-        return false;
-      } else {
-        return true;
-      }
+//      if (total == 0 || total < 500) {
+//        return false;
+//      } else {
+//        return true;
+//      }
+      return true;
     }
-    return false;
+    return true;
   }
 
   /**
